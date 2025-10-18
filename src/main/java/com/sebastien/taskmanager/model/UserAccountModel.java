@@ -1,13 +1,15 @@
-package com.sebastien.taskmanager.entity;
+package com.sebastien.taskmanager.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-public class Users {
+@Data
+@Entity (name = "UserAccount")
+public class UserAccountModel {
 
     @Id
     @GeneratedValue
@@ -20,5 +22,5 @@ public class Users {
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles = new HashSet<>();
+    private final Set<RoleModel> roles = new HashSet<>();
 }

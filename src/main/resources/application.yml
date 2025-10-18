@@ -22,3 +22,9 @@ server:
 jwt:
   secret: change-me-replace-with-long-random
   expiration-ms: 3600000
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

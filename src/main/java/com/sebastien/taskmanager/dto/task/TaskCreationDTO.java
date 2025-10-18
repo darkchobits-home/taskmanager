@@ -1,16 +1,13 @@
-package com.sebastien.taskmanager.entity;
+package com.sebastien.taskmanager.dto.task;
 
 import com.sebastien.taskmanager.enums.Status;
-import jakarta.persistence.*;
-
+import lombok.Data;
 
 import java.time.LocalDate;
 
-@Entity
-public class Task {
+@Data
+public class TaskCreationDTO {
 
-    @Id
-    @GeneratedValue
     private Long id;
 
     private String title;
@@ -19,6 +16,5 @@ public class Task {
 
     private LocalDate dueDate;
 
-    @Enumerated(EnumType.STRING)
     private Status status;
 }
