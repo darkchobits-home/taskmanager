@@ -65,7 +65,7 @@ public class TaskService {
         return Optional.of(taskModelSaved.getId());
     }
 
-    public Optional<Long> update(final Task task) {
+    public Optional<Long> updateTask(final Task task) {
         final Optional<TaskModel> existingTask = taskRepository.findById(task.getId());
 
         if (existingTask.isPresent()) {
@@ -79,4 +79,5 @@ public class TaskService {
 
         return Optional.empty();
     }
+
 }

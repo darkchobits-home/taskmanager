@@ -4,6 +4,7 @@ import com.sebastien.taskmanager.converter.task.TaskDtoToEntityConverter;
 import com.sebastien.taskmanager.converter.task.TaskEntityToDtoConverter;
 import com.sebastien.taskmanager.dto.task.TaskCreationDTO;
 import com.sebastien.taskmanager.dto.task.TaskDTO;
+import com.sebastien.taskmanager.dto.task.TaskUpdateDTO;
 import com.sebastien.taskmanager.entity.task.Task;
 import com.sebastien.taskmanager.service.TaskService;
 import jakarta.validation.constraints.NotNull;
@@ -50,6 +51,14 @@ public class TaskController {
     public ResponseEntity<Long> createTask(@RequestBody TaskCreationDTO taskCreationDTO) {
         final Task task = taskDtoToEntityConverter.convertCreationDtoToEntity(taskCreationDTO);
         final Optional<Long> taskId = taskService.createTask(task);
+
+        return taskId.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<Long> updateTask(@RequestBody TaskUpdateDTO taskUpdateDTO) {
+        final Task task = taskDtoToEntityConverter.convertUpdateDtoToEntity(taskUpdateDTO);
+        final Optional<Long> taskId = taskService.updateTask(task);
 
         return taskId.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }

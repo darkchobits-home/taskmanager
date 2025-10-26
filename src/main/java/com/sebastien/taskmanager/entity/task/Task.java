@@ -1,7 +1,8 @@
 package com.sebastien.taskmanager.entity.task;
 
 import com.sebastien.taskmanager.enums.Status;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 

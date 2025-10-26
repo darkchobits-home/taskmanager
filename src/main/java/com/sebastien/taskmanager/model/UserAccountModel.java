@@ -3,7 +3,6 @@ package com.sebastien.taskmanager.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,5 +21,5 @@ public class UserAccountModel {
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private final Set<RoleModel> roles = new HashSet<>();
+    private Set<RoleModel> roles = new HashSet<>();
 }
