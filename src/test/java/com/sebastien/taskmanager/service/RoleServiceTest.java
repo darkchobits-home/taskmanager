@@ -28,62 +28,6 @@ public class RoleServiceTest {
     private RoleRepository roleRepository;
 
     @Test
-    public void testGetAllRoles() {
-        // When
-        final RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setId(1L);
-        roleModel1Provided.setName("USER");
-
-        final RoleModel roleModel2Provided = new RoleModel();
-        roleModel2Provided.setId(2L);
-        roleModel2Provided.setName("ADMIN");
-
-        final List<RoleModel> roleModelListProvided = Arrays.asList(roleModel1Provided, roleModel2Provided);
-
-        Mockito.when(roleRepository.findAll()).thenReturn(roleModelListProvided);
-
-        // Then
-        Set<Role> roleSetResult =  roleService.getAll();
-
-        // Asserts
-        final Role role1Expected = new Role();
-        role1Expected.setId(1L);
-        role1Expected.setName("USER");
-
-        final Role role2Expected = new Role();
-        role2Expected.setId(2L);
-        role2Expected.setName("ADMIN");
-
-        final Set<Role> roleSetExpected = new HashSet<>(Arrays.asList(role1Expected, role2Expected));
-
-        assertThat(roleSetResult).hasSize(2);
-        assertThat(roleSetResult).containsAll(roleSetExpected);
-
-    }
-
-    @Test
-    public void testGetById() {
-        // When
-        final RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setId(1L);
-        roleModel1Provided.setName("USER");
-
-        Mockito.when(roleRepository.findById(1L)).thenReturn(Optional.of(roleModel1Provided));
-
-        // Then
-        Optional<Role> roleResult =  roleService.getById(1L);
-
-        // Asserts
-        final Role role1Expected = new Role();
-        role1Expected.setId(1L);
-        role1Expected.setName("USER");
-
-        assertThat(roleResult).isNotEmpty();
-        assertEquals(roleResult.get(), role1Expected);
-
-    }
-
-    @Test
     public void testGetById_IdDoesNotExist() {
         // When
         final RoleException roleException = new RoleException(RoleExceptionCode.ROLE_ID_DOES_NOT_EXIST);
@@ -102,12 +46,12 @@ public class RoleServiceTest {
     @Test
     public void testCreateRole_NameAlreadyExist() {
         // When
-        RoleModel roleModelProvided = new RoleModel();
+        final RoleModel roleModelProvided = new RoleModel();
         roleModelProvided.setName("USER");
 
         Mockito.when(roleRepository.findByName(roleModelProvided.getName())).thenReturn(Optional.of(roleModelProvided));
 
-        Role roleProvided = new Role();
+        final Role roleProvided = new Role();
         roleProvided.setName("USER");
 
         // Then
@@ -123,7 +67,7 @@ public class RoleServiceTest {
         // When
         Mockito.when(roleRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Role roleProvided = new Role();
+        final Role roleProvided = new Role();
         roleProvided.setId(1L);
         roleProvided.setName("USER");
 

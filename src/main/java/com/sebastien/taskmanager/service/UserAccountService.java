@@ -60,7 +60,6 @@ public class UserAccountService {
 
         final UserAccountModel userAccountModelToSave =  userAccountEntityToModelConverter.convert(userAccount, UserAccountModel.class);
 
-
         return save(userAccountModelToSave);
     }
 
