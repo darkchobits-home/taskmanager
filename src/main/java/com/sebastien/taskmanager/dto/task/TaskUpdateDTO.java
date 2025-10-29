@@ -7,7 +7,6 @@ import java.time.LocalDate;
 
 @Data
 public class TaskUpdateDTO {
-    private Long id;
 
     private String title;
 

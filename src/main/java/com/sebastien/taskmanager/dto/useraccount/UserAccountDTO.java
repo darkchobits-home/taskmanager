@@ -7,6 +7,8 @@ import java.util.List;
 
 @Data
 public class UserAccountDTO {
+    private Long id;
+
     private String username;
 
     private String email;

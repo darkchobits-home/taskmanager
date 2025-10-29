@@ -1,8 +1,7 @@
-package com.sebastien.taskmanager.controller;
+package com.sebastien.taskmanager.controller.error;
 
 import com.sebastien.taskmanager.exceptions.UserAccountException;
 import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -26,7 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         final HttpStatus status = getHttpStatusFromUserAccountExceptionCode(userAccountException.getUserAccountExceptionCode());
 
         // Path
-        final String path = ((HttpServletRequest) webRequest).getRequestURI();
+        final String path = ((ServletWebRequest) webRequest).getRequest().getRequestURI();
 
         // Creates a standard error response using exception data.
         final ErrorResponse errorResponse = new ErrorResponse(

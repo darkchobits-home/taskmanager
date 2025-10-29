@@ -8,8 +8,6 @@ import java.time.LocalDate;
 @Data
 public class TaskCreationDTO {
 
-    private Long id;
-
     private String title;
 
     private String description;

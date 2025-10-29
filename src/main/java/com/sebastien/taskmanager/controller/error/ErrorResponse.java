@@ -1,4 +1,4 @@
-package com.sebastien.taskmanager.controller;
+package com.sebastien.taskmanager.controller.error;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

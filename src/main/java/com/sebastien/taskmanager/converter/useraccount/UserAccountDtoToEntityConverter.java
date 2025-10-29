@@ -4,6 +4,7 @@ import com.sebastien.taskmanager.converter.GenericConverter;
 import com.sebastien.taskmanager.converter.role.RoleDtoToEntityConverter;
 import com.sebastien.taskmanager.dto.useraccount.UserAccountCreationDTO;
 import com.sebastien.taskmanager.dto.useraccount.UserAccountDTO;
+import com.sebastien.taskmanager.dto.useraccount.UserAccountUpdateDTO;
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
 import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
@@ -18,5 +19,9 @@ public class UserAccountDtoToEntityConverter extends GenericConverter<UserAccoun
 
     public UserAccount convertCreationDtoToEntity(final UserAccountCreationDTO userAccountCreationDTO) {
         return modelMapper.map(userAccountCreationDTO, UserAccount.class);
+    }
+
+    public UserAccount convertUpdateDtoToEntity(UserAccountUpdateDTO userAccountUpdateDTO) {
+        return modelMapper.map(userAccountUpdateDTO, UserAccount.class);
     }
 }
