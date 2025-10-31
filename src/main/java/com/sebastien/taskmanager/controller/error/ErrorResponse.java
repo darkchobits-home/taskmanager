@@ -35,13 +35,4 @@ public class ErrorResponse {
         this.timestamp = LocalDateTime.now();
     }
 
-    public ErrorResponse(HttpStatus status, int code, String message, String path, String internalCode) {
-        this(status, code, message, path);
-        this.internalCode = internalCode;
-    }
-
-    public ErrorResponse(HttpStatus status, int code, String message, String path, Map<String, String> details) {
-        this(status, code, message, path);
-        this.details = details;
-    }
 }

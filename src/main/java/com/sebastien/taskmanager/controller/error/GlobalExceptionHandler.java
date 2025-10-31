@@ -36,6 +36,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 path);
         errorResponse.setDetails(userAccountException.getDetails());
 
+        logger.error(userAccountException.getMessage());
+
         return new ResponseEntity<>(errorResponse, status);
     }
 

@@ -1,6 +1,5 @@
 package com.sebastien.taskmanager.dto.useraccount;
 
-import com.sebastien.taskmanager.dto.role.RoleCreationDTO;
 import com.sebastien.taskmanager.dto.role.RoleDTO;
 import lombok.Data;
 

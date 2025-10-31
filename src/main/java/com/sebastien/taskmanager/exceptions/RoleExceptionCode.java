@@ -11,9 +11,9 @@ public enum RoleExceptionCode {
     ROLE_ID_DOES_NOT_EXIST(2, "RoleId doesn't exist.")
     ;
 
-    private int codeValue;
+    private final int codeValue;
 
-    private String message;
+    private final String message;
 
     RoleExceptionCode(int codeValue, String message) {
         this.codeValue = codeValue;

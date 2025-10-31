@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test_db
+    username: taskmanageruser
+    password: taskmanagerpass
+    driver-class-name: org.h2.Driver
+

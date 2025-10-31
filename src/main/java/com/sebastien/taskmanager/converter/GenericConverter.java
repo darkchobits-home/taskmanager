@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GenericConverter<S, T> implements Converter<S, T> {
 
-    protected ModelMapper modelMapper;
+    protected final ModelMapper modelMapper;
 
     public GenericConverter() {
         this.modelMapper = new ModelMapper();

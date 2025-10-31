@@ -5,9 +5,7 @@ import com.sebastien.taskmanager.converter.useraccount.UserAccountEntityToDtoCon
 import com.sebastien.taskmanager.dto.useraccount.UserAccountCreationDTO;
 import com.sebastien.taskmanager.dto.useraccount.UserAccountDTO;
 import com.sebastien.taskmanager.dto.useraccount.UserAccountUpdateDTO;
-import com.sebastien.taskmanager.entity.role.Role;
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
-import com.sebastien.taskmanager.service.RoleService;
 import com.sebastien.taskmanager.service.UserAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,17 +25,14 @@ public class UserAccountController {
 
     private final UserAccountService userAccountService;
 
-    private final RoleService roleService;
-
     @Autowired
     private UserAccountDtoToEntityConverter userAccountDtoToEntityConverter;
 
     @Autowired
     private UserAccountEntityToDtoConverter userAccountEntityToDtoConverter;
 
-    public UserAccountController(UserAccountService userAccountService, RoleService roleService) {
+    public UserAccountController(UserAccountService userAccountService) {
         this.userAccountService = userAccountService;
-        this.roleService = roleService;
     }
 
     @Operation(summary = "Create a user account", description = "Return the user account id.")

@@ -3,8 +3,6 @@ package com.sebastien.taskmanager.service;
 import com.sebastien.taskmanager.TaskmanagerApplication;
 import com.sebastien.taskmanager.entity.role.Role;
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
-import com.sebastien.taskmanager.exceptions.RoleException;
-import com.sebastien.taskmanager.exceptions.RoleExceptionCode;
 import com.sebastien.taskmanager.exceptions.UserAccountException;
 import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
 import com.sebastien.taskmanager.model.RoleModel;
@@ -13,16 +11,21 @@ import com.sebastien.taskmanager.repository.UserAccountRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = TaskmanagerApplication.class)
+@TestPropertySource(locations = "classpath:application-integrationtest.yml")
 public class UserAccountServiceTest {
 
     @Autowired
@@ -30,6 +33,21 @@ public class UserAccountServiceTest {
 
     @MockitoBean
     private UserAccountRepository userAccountRepository;
+
+    private static UserAccountModel createUserAccountModel() {
+        final RoleModel roleModel = new RoleModel();
+        roleModel.setId(1L);
+        roleModel.setName("USER");
+
+        final UserAccountModel userAccountModel = new UserAccountModel();
+        userAccountModel.setId(1L);
+        userAccountModel.setEmail("email@user1.com");
+        userAccountModel.setUsername("name1");
+        userAccountModel.setPassword("pass1");
+        userAccountModel.setRoles(new HashSet<>(List.of(roleModel)));
+
+        return userAccountModel;
+    }
 
     @Test
     public void testGetById_IdDoesNotExist() {
@@ -50,16 +68,7 @@ public class UserAccountServiceTest {
     @Test
     public void testCreateUserAccount_NameAlreadyExist() {
         // When
-        final RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setId(1L);
-        roleModel1Provided.setName("USER");
-
-        final UserAccountModel userAccountModel1Provided = new UserAccountModel();
-        userAccountModel1Provided.setId(1L);
-        userAccountModel1Provided.setEmail("email@user1.com");
-        userAccountModel1Provided.setUsername("name1");
-        userAccountModel1Provided.setPassword("pass1");
-        userAccountModel1Provided.setRoles(new HashSet<>(List.of(roleModel1Provided)));
+        final UserAccountModel userAccountModel1Provided = createUserAccountModel();
 
         Mockito.when(userAccountRepository.findByUsername(userAccountModel1Provided.getUsername())).thenReturn(Optional.of(userAccountModel1Provided));
 
