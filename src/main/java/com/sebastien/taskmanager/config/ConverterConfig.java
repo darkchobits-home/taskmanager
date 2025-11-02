@@ -15,7 +15,9 @@ import com.sebastien.taskmanager.converter.useraccount.UserAccountModelToEntityC
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+
 @Component
+@SuppressWarnings("unused")
 public class ConverterConfig {
 
     // Tasks

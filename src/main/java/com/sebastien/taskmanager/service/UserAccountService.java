@@ -1,6 +1,5 @@
 package com.sebastien.taskmanager.service;
 
-import com.sebastien.taskmanager.converter.useraccount.UserAccountEntityToDtoConverter;
 import com.sebastien.taskmanager.converter.useraccount.UserAccountEntityToModelConverter;
 import com.sebastien.taskmanager.converter.useraccount.UserAccountModelToEntityConverter;
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
@@ -25,12 +24,11 @@ public class UserAccountService {
     private UserAccountRepository userAccountRepository;
 
     @Autowired
-    private UserAccountEntityToDtoConverter userAccountEntityToDtoConverter;
-
-    @Autowired
+    @SuppressWarnings("unused")
     private UserAccountModelToEntityConverter userAccountModelToEntityConverter;
 
     @Autowired
+    @SuppressWarnings("unused")
     private UserAccountEntityToModelConverter userAccountEntityToModelConverter;
 
 
@@ -38,7 +36,7 @@ public class UserAccountService {
      * Create a userAccount in database.
      *
      * @param userAccount UserAccount to create.
-     * @return Id of the new UserAccount.
+     * @return The id of the new UserAccount.
      */
     public Optional<Long> createUserAccount(final UserAccount userAccount) {
         // Check if roles are defined

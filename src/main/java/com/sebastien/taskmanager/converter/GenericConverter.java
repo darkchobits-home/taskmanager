@@ -6,6 +6,7 @@ import org.modelmapper.spi.MappingContext;
 import org.springframework.stereotype.Component;
 
 @Component
+@SuppressWarnings("unused")
 public class GenericConverter<S, T> implements Converter<S, T> {
 
     protected final ModelMapper modelMapper;

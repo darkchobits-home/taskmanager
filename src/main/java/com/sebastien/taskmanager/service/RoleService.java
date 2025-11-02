@@ -19,12 +19,15 @@ import java.util.stream.Collectors;
 public class RoleService {
 
     @Autowired
+    @SuppressWarnings("unused")
     private RoleRepository roleRepository;
 
     @Autowired
+    @SuppressWarnings("unused")
     private RoleEntityToModelConverter roleEntityToModelConverter;
 
     @Autowired
+    @SuppressWarnings("unused")
     private RoleModelToEntityConverter roleModelToEntityConverter;
 
     /**

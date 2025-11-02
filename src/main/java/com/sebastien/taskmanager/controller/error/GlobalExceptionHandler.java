@@ -21,6 +21,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(UserAccountException.class)
+    @SuppressWarnings("unused")
     public ResponseEntity<Object> handleUserAccountException(UserAccountException userAccountException, WebRequest webRequest) {
         // Status
         final HttpStatus status = getHttpStatusFromUserAccountExceptionCode(userAccountException.getUserAccountExceptionCode());

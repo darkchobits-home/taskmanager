@@ -1,7 +1,5 @@
 package com.sebastien.taskmanager.service;
 
-import com.sebastien.taskmanager.converter.task.TaskDtoToEntityConverter;
-import com.sebastien.taskmanager.converter.task.TaskEntityToDtoConverter;
 import com.sebastien.taskmanager.converter.task.TaskEntityToModelConverter;
 import com.sebastien.taskmanager.converter.task.TaskModelToEntityConverter;
 import com.sebastien.taskmanager.entity.task.Task;
@@ -21,19 +19,16 @@ import java.util.stream.Collectors;
 public class TaskService {
 
     @Autowired
+    @SuppressWarnings("unused")
     private TaskRepository taskRepository;
 
     @Autowired
+    @SuppressWarnings("unused")
     private TaskModelToEntityConverter taskModelToEntityConverter;
 
     @Autowired
+    @SuppressWarnings("unused")
     private TaskEntityToModelConverter taskEntityToModelConverter;
-
-    @Autowired
-    private TaskEntityToDtoConverter taskEntityToDtoConverter;
-
-    @Autowired
-    private TaskDtoToEntityConverter taskDtoToEntityConverter;
 
     public TaskService() {
     }
@@ -101,7 +96,7 @@ public class TaskService {
      *
      * @param taskId The id of the Task.
      */
-    public void delete(final Long taskId) {
+    public void deleteTask(final Long taskId) {
         final Optional<TaskModel> existingTask = taskRepository.findById(taskId);
         existingTask.ifPresent(taskModel -> taskRepository.delete(taskModel));
     }

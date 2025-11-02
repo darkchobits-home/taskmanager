@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/api/useraccount")
 @RestController
+@SuppressWarnings("unused")
 public class UserAccountController {
 
     private final UserAccountService userAccountService;

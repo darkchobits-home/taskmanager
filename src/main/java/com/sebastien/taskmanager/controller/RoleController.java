@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/api/roles")
 @RestController
+@SuppressWarnings("unused")
 public class RoleController {
 
     private final RoleService roleService;

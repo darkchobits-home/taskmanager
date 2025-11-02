@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		"com.sebastien.taskmanager.exceptions",
 		"com.sebastien.taskmanager.repository",
 		"com.sebastien.taskmanager.service"})
-//@EnableWebMvc
+
 public class TaskmanagerApplication {
 
 	public static void main(String[] args) {

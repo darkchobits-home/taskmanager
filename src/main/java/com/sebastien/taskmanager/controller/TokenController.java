@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/token")
 @RestController
+@SuppressWarnings("unused")
 public class TokenController {
 
     @GetMapping

@@ -25,9 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RoleServiceTest {
 
     @Autowired
+    @SuppressWarnings("unused")
     private RoleService roleService;
 
     @MockitoBean
+    @SuppressWarnings("unused")
     private RoleRepository roleRepository;
 
     @Test
