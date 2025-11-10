@@ -1,9 +1,6 @@
 package com.sebastien.taskmanager.controller.error;
 
-import com.sebastien.taskmanager.exceptions.RoleException;
-import com.sebastien.taskmanager.exceptions.RoleExceptionCode;
-import com.sebastien.taskmanager.exceptions.UserAccountException;
-import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
+import com.sebastien.taskmanager.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -66,6 +63,30 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, status);
     }
 
+    @ExceptionHandler(TaskException.class)
+    @SuppressWarnings("unused")
+    public ResponseEntity<Object> handleRoleException(TaskException taskException, WebRequest webRequest) {
+        // Status
+        final HttpStatus status = getHttpStatusFromTaskExceptionCode(taskException.getTaskExceptionCode());
+
+        // Path
+        final String path = ((ServletWebRequest) webRequest).getRequest().getRequestURI();
+
+        // Creates a standard error response using exception data.
+        final ErrorResponse errorResponse = new ErrorResponse(
+                status,
+                taskException.getTaskExceptionCode().getCodeValue(),
+                taskException.getMessage(),
+                path);
+        errorResponse.setDetails(taskException.getDetails());
+
+        logger.error(taskException.getMessage());
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+
+
     private HttpStatus getHttpStatusFromUserAccountExceptionCode(final UserAccountExceptionCode userAccountExceptionCode) {
         switch (userAccountExceptionCode) {
             case USERNAME_ALREADY_EXISTS ->  {
@@ -94,5 +115,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             }
         }
 
+    }
+
+    private HttpStatus getHttpStatusFromTaskExceptionCode(TaskExceptionCode taskExceptionCode) {
+        switch (taskExceptionCode) {
+            case TASK_ID_DOES_NOT_EXIST ->  {
+                return HttpStatus.BAD_REQUEST;
+            }
+            default -> {
+                return HttpStatus.FORBIDDEN;
+            }
+        }
     }
 }

@@ -98,7 +98,14 @@ public class TaskService {
      */
     public void deleteTask(final Long taskId) {
         final Optional<TaskModel> existingTask = taskRepository.findById(taskId);
-        existingTask.ifPresent(taskModel -> taskRepository.delete(taskModel));
+
+        if (existingTask.isEmpty()) {
+            TaskException taskException = new TaskException(TaskExceptionCode.TASK_ID_DOES_NOT_EXIST);
+            taskException.getDetails().put("Id", String.valueOf(taskId));
+
+            throw taskException;
+        }
+        taskRepository.delete(existingTask.get());
     }
 
     /**

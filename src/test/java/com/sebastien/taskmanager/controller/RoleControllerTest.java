@@ -82,7 +82,7 @@ public class RoleControllerTest {
 
         roleRepository.save(roleModel2Provided);
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get("/api/roles");
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL);
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
@@ -188,9 +188,8 @@ public class RoleControllerTest {
 
     @Test
     void deleteRoleTest_RoleDoesNotExist() throws Exception {
-        mockMvc.perform(get("/api/roles/delete/9999"))
+        mockMvc.perform(get(URL + "/delete/9999"))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
-
     }
 }
