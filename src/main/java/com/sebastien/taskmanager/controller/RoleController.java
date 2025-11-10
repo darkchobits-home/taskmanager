@@ -41,6 +41,7 @@ public class RoleController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created."),
             @ApiResponse(responseCode = "400", description = "Error bad request, see details in logs."),
+            @ApiResponse(responseCode = "409", description = "Error conflict, see details in logs."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @PostMapping

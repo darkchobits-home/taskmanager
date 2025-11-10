@@ -1,5 +1,7 @@
 package com.sebastien.taskmanager.controller.error;
 
+import com.sebastien.taskmanager.exceptions.RoleException;
+import com.sebastien.taskmanager.exceptions.RoleExceptionCode;
 import com.sebastien.taskmanager.exceptions.UserAccountException;
 import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
 import org.slf4j.Logger;
@@ -42,9 +44,49 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, status);
     }
 
+    @ExceptionHandler(RoleException.class)
+    @SuppressWarnings("unused")
+    public ResponseEntity<Object> handleRoleException(RoleException roleException, WebRequest webRequest) {
+        // Status
+        final HttpStatus status = getHttpStatusFromRoleExceptionCode(roleException.getRoleExceptionCode());
+
+        // Path
+        final String path = ((ServletWebRequest) webRequest).getRequest().getRequestURI();
+
+        // Creates a standard error response using exception data.
+        final ErrorResponse errorResponse = new ErrorResponse(
+                status,
+                roleException.getRoleExceptionCode().getCodeValue(),
+                roleException.getMessage(),
+                path);
+        errorResponse.setDetails(roleException.getDetails());
+
+        logger.error(roleException.getMessage());
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
     private HttpStatus getHttpStatusFromUserAccountExceptionCode(final UserAccountExceptionCode userAccountExceptionCode) {
         switch (userAccountExceptionCode) {
-            case USERNAME_ALREADY_EXISTS, NO_ROLE_DEFINED -> {
+            case USERNAME_ALREADY_EXISTS ->  {
+                return HttpStatus.CONFLICT;
+            }
+            case NO_ROLE_DEFINED -> {
+                return HttpStatus.BAD_REQUEST;
+            }
+            default -> {
+                return HttpStatus.FORBIDDEN;
+            }
+        }
+
+    }
+
+    private HttpStatus getHttpStatusFromRoleExceptionCode(final RoleExceptionCode roleExceptionCode) {
+        switch (roleExceptionCode) {
+            case ROLE_NAME_ALREADY_EXISTS ->  {
+                return HttpStatus.CONFLICT;
+            }
+            case ROLE_ID_DOES_NOT_EXIST -> {
                 return HttpStatus.BAD_REQUEST;
             }
             default -> {

@@ -134,8 +134,16 @@ public class UserAccountService {
      * @return The id of the user account saved.
      */
     public Optional<Long> save(final UserAccountModel userAccountModel) {
-        final UserAccountModel userAccountModelSaved = userAccountRepository.save(userAccountModel);
+        try {
+            final UserAccountModel userAccountModelSaved = userAccountRepository.save(userAccountModel);
 
-        return Optional.of(userAccountModelSaved.getId());
+            return Optional.of(userAccountModelSaved.getId());
+        } catch (RuntimeException e) {
+            final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.UNKNOWN_EXCEPTION);
+            userAccountException.getDetails().put("Cause", e.getCause().toString());
+            userAccountException.getDetails().put("UserAccount Model", userAccountModel.toString());
+
+            throw userAccountException;
+        }
     }
 }

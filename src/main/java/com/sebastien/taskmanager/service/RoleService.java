@@ -87,7 +87,7 @@ public class RoleService {
 
         if (RoleModelOptional.isEmpty()) {
             final RoleException RoleException = new RoleException(RoleExceptionCode.ROLE_ID_DOES_NOT_EXIST);
-            RoleException.getDetails().put("Id", String.valueOf(role.getId()));
+            RoleException.getDetails().put("id", String.valueOf(role.getId()));
             RoleException.getDetails().put("name", role.getName());
 
             throw RoleException;

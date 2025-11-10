@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum TaskExceptionCode {
 
-    UNKNOWN_EXCEPTION(-1, "Unknown exception."),
+    UNKNOWN_EXCEPTION(-1, "Task unknown exception."),
     TASK_ID_DOES_NOT_EXIST(1, "RoleId doesn't exist.")
     ;
 

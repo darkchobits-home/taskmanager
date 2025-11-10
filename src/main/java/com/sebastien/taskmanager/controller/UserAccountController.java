@@ -97,7 +97,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "200", description = "Successfully deleted."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @PostMapping("/delete/{id}")
+    @GetMapping("/delete/{userAccountId}")
     public ResponseEntity<Long> deleteUser(@PathVariable @NotNull Long userAccountId) {
         userAccountService.deleteUserAccount(userAccountId);
 

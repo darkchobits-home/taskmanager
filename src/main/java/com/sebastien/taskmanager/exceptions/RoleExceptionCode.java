@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum RoleExceptionCode {
 
-    UNKNOWN_EXCEPTION(-1, "Unknown exception."),
+    UNKNOWN_EXCEPTION(-1, "Role unknown exception."),
     ROLE_NAME_ALREADY_EXISTS(1, "Role name already exists."),
     ROLE_ID_DOES_NOT_EXIST(2, "RoleId doesn't exist.")
     ;

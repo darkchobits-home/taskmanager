@@ -2,6 +2,7 @@ package com.sebastien.taskmanager.converter;
 
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ public class GenericConverter<S, T> implements Converter<S, T> {
 
     public GenericConverter() {
         this.modelMapper = new ModelMapper();
+        this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     }
 
     public T convert(S source, Class<T> resultClass) {
