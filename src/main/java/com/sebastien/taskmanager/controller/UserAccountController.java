@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -26,14 +27,17 @@ public class UserAccountController {
 
     private final UserAccountService userAccountService;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserAccountDtoToEntityConverter userAccountDtoToEntityConverter;
 
     @Autowired
     private UserAccountEntityToDtoConverter userAccountEntityToDtoConverter;
 
-    public UserAccountController(UserAccountService userAccountService) {
+    public UserAccountController(UserAccountService userAccountService, PasswordEncoder passwordEncoder) {
         this.userAccountService = userAccountService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Operation(summary = "Create a user account", description = "Return the user account id.")
@@ -46,6 +50,8 @@ public class UserAccountController {
     public ResponseEntity<Long> createUser(@RequestBody UserAccountCreationDTO userAccountCreationDTO) {
 
         final UserAccount userAccount = userAccountDtoToEntityConverter.convertCreationDtoToEntity(userAccountCreationDTO);
+        final String passwordEncoded = passwordEncoder.encode(userAccount.getPassword());
+        userAccount.setPassword(passwordEncoded);
 
         final Optional<Long> userAccountId = userAccountService.createUserAccount(userAccount);
 
@@ -86,6 +92,9 @@ public class UserAccountController {
     public ResponseEntity<Long> updateUser(@RequestBody UserAccountUpdateDTO userAccountUpdateDTO) {
 
         final UserAccount userAccount = userAccountDtoToEntityConverter.convertUpdateDtoToEntity(userAccountUpdateDTO);
+        final String passwordEncoded = passwordEncoder.encode(userAccount.getPassword());
+        userAccount.setPassword(passwordEncoded);
+
         final Optional<Long> userAccountId = userAccountService.updateUserAccount(userAccount);
 
         return userAccountId.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());

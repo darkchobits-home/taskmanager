@@ -1,16 +1,10 @@
 package com.sebastien.taskmanager.controller;
 
-import com.sebastien.taskmanager.dto.role.RoleDTO;
 import com.sebastien.taskmanager.model.RoleModel;
 import com.sebastien.taskmanager.repository.RoleRepository;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -20,16 +14,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
-@AutoConfigureMockMvc
-@SpringBootTest
-@Transactional
-public class RoleControllerTest {
+public class RoleControllerTest extends GenericControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -39,9 +28,11 @@ public class RoleControllerTest {
 
     private final String URL = "/api/roles";
 
-    @BeforeEach
-    void setup() {
-        roleRepository.deleteAll();
+    @Test
+    void protectedEndpointShouldReturn401WithoutToken() throws Exception {
+        mockMvc.perform(get(URL))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -51,20 +42,23 @@ public class RoleControllerTest {
 
         roleModelProvided = roleRepository.save(roleModelProvided);
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/" + roleModelProvided.getId());
+        final String token = generateToken();
 
-        final RoleDTO roleDTO = new RoleDTO();
-        roleDTO.setName("USER");
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/" + roleModelProvided.getId())
+                .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.name").value(roleDTO.getName()));
+                .andExpect(jsonPath("$.name").value("USER"));
     }
 
     @Test
     void getByIdTest_RoleNotFound() throws Exception {
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/9999");
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/9999")
+                .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
                 .andExpect(status().isNotFound());
@@ -73,21 +67,23 @@ public class RoleControllerTest {
     @Test
     void getAllTest() throws Exception {
         final RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setName("USER");
+        roleModel1Provided.setName("MANAGER");
 
         roleRepository.save(roleModel1Provided);
 
         final RoleModel roleModel2Provided = new RoleModel();
-        roleModel2Provided.setName("ADMIN");
+        roleModel2Provided.setName("USER");
 
         roleRepository.save(roleModel2Provided);
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL);
+        final String token = generateToken();
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL)
+                .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[*].name", containsInAnyOrder("USER", "ADMIN")));
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder("USER", "MANAGER", "ADMIN")));
     }
 
     @Test
@@ -98,9 +94,13 @@ public class RoleControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post(URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(roleJson))
+        final String token = generateToken();
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roleJson)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
@@ -122,9 +122,13 @@ public class RoleControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post(URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(roleJson))
+        final String token = generateToken();
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roleJson)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isConflict());
     }
@@ -143,9 +147,13 @@ public class RoleControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post(URL + "/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(String.format(roleJson, roleModel1Provided.getId())))
+        final String token = generateToken();
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format(roleJson, roleModel1Provided.getId()))
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
@@ -163,10 +171,13 @@ public class RoleControllerTest {
                         "name": "MANAGER"
                     }
                 """;
+        final String token = generateToken();
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roleJson)
+                .header("Authorization", "Bearer " + token);
 
-        mockMvc.perform(post(URL + "/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(roleJson))
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -178,7 +189,11 @@ public class RoleControllerTest {
 
         roleModel1Provided = roleRepository.save(roleModel1Provided);
 
-        mockMvc.perform(get(URL + "/delete/" + roleModel1Provided.getId()))
+        final String token = generateToken();
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/" + roleModel1Provided.getId())
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -188,8 +203,13 @@ public class RoleControllerTest {
 
     @Test
     void deleteRoleTest_RoleDoesNotExist() throws Exception {
-        mockMvc.perform(get(URL + "/delete/9999"))
+        final String token = generateToken();
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/9999")
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
+
 }

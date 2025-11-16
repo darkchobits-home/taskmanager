@@ -41,7 +41,7 @@ public class UserAccountServiceTest {
 
         final UserAccountModel userAccountModel = new UserAccountModel();
         userAccountModel.setId(1L);
-        userAccountModel.setEmail("email@user1.com");
+        userAccountModel.setUsername("email@user1.com");
         userAccountModel.setUsername("name1");
         userAccountModel.setPassword("pass1");
         userAccountModel.setRoles(new HashSet<>(List.of(roleModel)));
@@ -52,7 +52,7 @@ public class UserAccountServiceTest {
     @Test
     public void testGetById_IdDoesNotExist() {
         // When
-        final UserAccountException roleException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_ID_DOES_NOT_EXIST);
+        final UserAccountException roleException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
 
         Mockito.when(userAccountRepository.findById(1L)).thenThrow(roleException);
 
@@ -61,7 +61,7 @@ public class UserAccountServiceTest {
 
         // Asserts
         assertThat(userAccountExceptionResult).isNotNull();
-        assertThat(userAccountExceptionResult.getUserAccountExceptionCode()).isSameAs(UserAccountExceptionCode.USER_ACCOUNT_ID_DOES_NOT_EXIST);
+        assertThat(userAccountExceptionResult.getUserAccountExceptionCode()).isSameAs(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
     }
 
 
@@ -77,7 +77,7 @@ public class UserAccountServiceTest {
         role1Provided.setName("USER");
 
         final UserAccount userAccount1Provided = new UserAccount();
-        userAccount1Provided.setEmail("email@user1.com");
+        userAccount1Provided.setUsername("email@user1.com");
         userAccount1Provided.setUsername("name1");
         userAccount1Provided.setPassword("pass1");
         userAccount1Provided.setRoles(new HashSet<>(List.of(role1Provided)));
@@ -96,7 +96,7 @@ public class UserAccountServiceTest {
         Mockito.when(userAccountRepository.findByUsername(Mockito.anyString())).thenReturn(Optional.empty());
 
         final UserAccount userAccount1Provided = new UserAccount();
-        userAccount1Provided.setEmail("email@user1.com");
+        userAccount1Provided.setUsername("email@user1.com");
         userAccount1Provided.setUsername("name1");
         userAccount1Provided.setPassword("pass1");
         userAccount1Provided.setRoles(new HashSet<>());
@@ -120,7 +120,7 @@ public class UserAccountServiceTest {
 
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setId(1L);
-        userAccount1Provided.setEmail("email@user1.com");
+        userAccount1Provided.setUsername("email@user1.com");
         userAccount1Provided.setUsername("name1");
         userAccount1Provided.setPassword("pass1");
         userAccount1Provided.setRoles(new HashSet<>(List.of(role1Provided)));
@@ -130,6 +130,6 @@ public class UserAccountServiceTest {
 
         // Assert
         assertThat(userAccountExceptionResult).isNotNull();
-        assertThat(userAccountExceptionResult.getUserAccountExceptionCode()).isSameAs(UserAccountExceptionCode.USER_ACCOUNT_ID_DOES_NOT_EXIST);
+        assertThat(userAccountExceptionResult.getUserAccountExceptionCode()).isSameAs(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
     }
 }

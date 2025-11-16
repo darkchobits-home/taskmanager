@@ -77,6 +77,23 @@ public class RoleService {
     }
 
     /**
+     * Get a role with the name in parameter.
+     *
+     * @param name The name of the role.
+     * @return The role found, or an Optional.empty().
+     */
+    public Optional<Role> getByName(String name) {
+        final Optional<RoleModel> roleModelOptional = roleRepository.findByName(name);
+
+        if (roleModelOptional.isEmpty()) {
+            final RoleException RoleException = new RoleException(RoleExceptionCode.ROLE_NOT_FOUND);
+            RoleException.getDetails().put("Name", name);
+        }
+
+        return roleModelOptional.map(roleModel -> roleModelToEntityConverter.convert(roleModel, Role.class));
+    }
+
+    /**
      * Update a role.
      *
      * @param role The role with new values.

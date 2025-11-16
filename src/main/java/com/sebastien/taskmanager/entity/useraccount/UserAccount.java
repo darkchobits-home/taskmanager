@@ -13,8 +13,6 @@ public class UserAccount {
 
     private String username;
 
-    private String email;
-
     private String password;
 
     private Set<Role> roles = new HashSet<>();

@@ -16,10 +16,8 @@ public class UserAccountModel {
 
     private String username;
 
-    private String email;
-
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<RoleModel> roles = new HashSet<>();
 }

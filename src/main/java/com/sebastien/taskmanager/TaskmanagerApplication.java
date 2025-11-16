@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		"com.sebastien.taskmanager.enums",
 		"com.sebastien.taskmanager.exceptions",
 		"com.sebastien.taskmanager.repository",
+		"com.sebastien.taskmanager.security",
 		"com.sebastien.taskmanager.service"})
 
 public class TaskmanagerApplication {

@@ -5,7 +5,9 @@ import com.sebastien.taskmanager.converter.useraccount.UserAccountModelToEntityC
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
 import com.sebastien.taskmanager.exceptions.UserAccountException;
 import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
+import com.sebastien.taskmanager.model.RoleModel;
 import com.sebastien.taskmanager.model.UserAccountModel;
+import com.sebastien.taskmanager.repository.RoleRepository;
 import com.sebastien.taskmanager.repository.UserAccountRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +34,8 @@ public class UserAccountService {
     @SuppressWarnings("unused")
     private UserAccountEntityToModelConverter userAccountEntityToModelConverter;
 
+    @Autowired
+    private RoleRepository roleRepository;
 
     /**
      * Create a userAccount in database.
@@ -39,14 +44,6 @@ public class UserAccountService {
      * @return The id of the new UserAccount.
      */
     public Optional<Long> createUserAccount(final UserAccount userAccount) {
-        // Check if roles are defined
-        if (CollectionUtils.isEmpty(userAccount.getRoles())) {
-            final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.NO_ROLE_DEFINED);
-            userAccountException.getDetails().put("Username", userAccount.getUsername());
-
-            throw userAccountException;
-        }
-
         // Check if user already exists
         Optional<UserAccountModel> userAccountModelOptional = userAccountRepository.findByUsername(userAccount.getUsername());
         if (userAccountModelOptional.isPresent()) {
@@ -56,7 +53,24 @@ public class UserAccountService {
             throw userAccountException;
         }
 
+        // Check if roles are defined
+        if (CollectionUtils.isEmpty(userAccount.getRoles())) {
+            final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.NO_ROLE_DEFINED);
+            userAccountException.getDetails().put("Username", userAccount.getUsername());
+
+            throw userAccountException;
+        }
+
         final UserAccountModel userAccountModelToSave =  userAccountEntityToModelConverter.convert(userAccount, UserAccountModel.class);
+
+        // Get existing role in database
+        final Set<RoleModel> roleModelSet = userAccount.getRoles().stream()
+                .map(role -> roleRepository.findByName(role.getName()).orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        userAccountModelToSave.setRoles(roleModelSet);
+
+
 
         return save(userAccountModelToSave);
     }
@@ -87,6 +101,18 @@ public class UserAccountService {
     }
 
     /**
+     * Get a user account with the id in parameter.
+     *
+     * @param username The username of the user account.
+     * @return The user account found, or an Optional.empty().
+     */
+    public Optional<UserAccount> getByUsername(@NotNull String username) {
+        final Optional<UserAccountModel> userAccountModelOptional = userAccountRepository.findByUsername(username);
+
+        return userAccountModelOptional.map(userAccountModel -> userAccountModelToEntityConverter.convert(userAccountModel, UserAccount.class));
+    }
+
+    /**
      * Update a user account.
      *
      * @param userAccount The user account with new values.
@@ -96,7 +122,7 @@ public class UserAccountService {
         Optional<UserAccountModel> userAccountModelOptional = userAccountRepository.findById(userAccount.getId());
 
         if (userAccountModelOptional.isEmpty()) {
-            final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_ID_DOES_NOT_EXIST);
+            final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
             userAccountException.getDetails().put("Id", String.valueOf(userAccount.getId()));
             userAccountException.getDetails().put("Username", userAccount.getUsername());
 
@@ -105,6 +131,7 @@ public class UserAccountService {
 
         final UserAccountModel userAccountModelToSave =  userAccountEntityToModelConverter.convert(userAccount, UserAccountModel.class);
         userAccountModelToSave.setId(userAccountModelOptional.get().getId());
+
 
         return save(userAccountModelToSave);
     }
@@ -118,7 +145,7 @@ public class UserAccountService {
         Optional<UserAccountModel> userAccountModelOptional = userAccountRepository.findById(userAccountId);
 
         if (userAccountModelOptional.isEmpty()) {
-            final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_ID_DOES_NOT_EXIST);
+            final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
             userAccountException.getDetails().put("Id", String.valueOf(userAccountId));
 
             throw userAccountException;

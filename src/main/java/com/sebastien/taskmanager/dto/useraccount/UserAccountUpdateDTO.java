@@ -11,8 +11,6 @@ public class UserAccountUpdateDTO {
 
     private String username;
 
-    private String email;
-
     private String password;
 
     private List<RoleUpdateDTO> roles;

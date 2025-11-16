@@ -8,7 +8,8 @@ public enum RoleExceptionCode {
 
     UNKNOWN_EXCEPTION(-1, "Role unknown exception."),
     ROLE_NAME_ALREADY_EXISTS(1, "Role name already exists."),
-    ROLE_ID_DOES_NOT_EXIST(2, "RoleId doesn't exist.")
+    ROLE_ID_DOES_NOT_EXIST(2, "RoleId doesn't exist."),
+    ROLE_NOT_FOUND(3, "Role not found.")
     ;
 
     private final int codeValue;

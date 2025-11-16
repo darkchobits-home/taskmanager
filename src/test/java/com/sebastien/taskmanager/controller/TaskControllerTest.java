@@ -4,14 +4,11 @@ import com.sebastien.taskmanager.dto.task.TaskDTO;
 import com.sebastien.taskmanager.enums.Status;
 import com.sebastien.taskmanager.model.TaskModel;
 import com.sebastien.taskmanager.repository.TaskRepository;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
+import com.sebastien.taskmanager.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,30 +19,26 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
-@AutoConfigureMockMvc
-@SpringBootTest
-@Transactional
-public class TaskControllerTest {
+
+public class TaskControllerTest extends GenericControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private TaskRepository taskRepository;
 
-    private final String URL = "/api/tasks";
+    @Autowired
+    private JwtService jwtService;
 
-    @BeforeEach
-    void setup() {
-        taskRepository.deleteAll();
-    }
+    private final String URL = "/api/tasks";
 
     @Test
     void getByIdTest() throws Exception {
@@ -53,7 +46,10 @@ public class TaskControllerTest {
 
         taskModelProvided = taskRepository.save(taskModelProvided);
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/" + taskModelProvided.getId());
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/" + taskModelProvided.getId())
+                .header("Authorization", "Bearer " + token);
 
         final TaskDTO taskDTOExpected = new TaskDTO();
         taskDTOExpected.setTitle("Title");
@@ -72,7 +68,10 @@ public class TaskControllerTest {
 
     @Test
     void getByIdTest_TaskNotFound() throws Exception {
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/9999");
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/9999")
+                .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
                 .andExpect(status().isNotFound());
@@ -89,7 +88,10 @@ public class TaskControllerTest {
 
         taskRepository.save(taskModel2Provided);
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL);
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL)
+                .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
@@ -107,9 +109,14 @@ public class TaskControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post(URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(taskJson))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(taskJson)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
@@ -134,9 +141,14 @@ public class TaskControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post(URL + "/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(String.format(taskJson, taskModelProvided.getId())))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format(taskJson, taskModelProvided.getId()))
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
@@ -159,9 +171,14 @@ public class TaskControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post(URL + "/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(taskJson))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(taskJson)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
@@ -172,7 +189,12 @@ public class TaskControllerTest {
 
         taskModelProvided = taskRepository.save(taskModelProvided);
 
-        mockMvc.perform(get(URL + "/delete/" + taskModelProvided.getId()))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/" + taskModelProvided.getId())
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -182,7 +204,12 @@ public class TaskControllerTest {
 
     @Test
     void deleteTaskTest_TaskDoesNotExist() throws Exception {
-        mockMvc.perform(get(URL + "/delete/9999"))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/9999")
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 

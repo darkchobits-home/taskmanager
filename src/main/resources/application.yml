@@ -20,7 +20,7 @@ server:
   port: 8080
 
 jwt:
-  secret: change-me-replace-with-long-random
+  secret: cG9ydG9mZm9saW9fdGVzdF9zZWNyZXRfa2V5X2Zvcl9kZXZfcHJvZmlsZQ==
   expiration-ms: 3600000
 
 logging:

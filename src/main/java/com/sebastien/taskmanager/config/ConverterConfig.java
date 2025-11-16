@@ -13,10 +13,10 @@ import com.sebastien.taskmanager.converter.useraccount.UserAccountEntityToDtoCon
 import com.sebastien.taskmanager.converter.useraccount.UserAccountEntityToModelConverter;
 import com.sebastien.taskmanager.converter.useraccount.UserAccountModelToEntityConverter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 
-@Component
+@Configuration
 @SuppressWarnings("unused")
 public class ConverterConfig {
 

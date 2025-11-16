@@ -6,14 +6,10 @@ import com.sebastien.taskmanager.model.RoleModel;
 import com.sebastien.taskmanager.model.UserAccountModel;
 import com.sebastien.taskmanager.repository.RoleRepository;
 import com.sebastien.taskmanager.repository.UserAccountRepository;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,21 +19,18 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
-@AutoConfigureMockMvc
-@SpringBootTest
-@Transactional
-public class UserAccountControllerTest {
+public class UserAccountControllerTest extends GenericControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserAccountRepository userAccountRepository;
@@ -47,18 +40,17 @@ public class UserAccountControllerTest {
 
     private final String URL = "/api/useraccount";
 
-    @BeforeEach
-    void setup() {
-        userAccountRepository.deleteAll();
-    }
-
     @Test
     void getByIdTest() throws Exception {
         UserAccountModel userAccountModelProvided = createUserAccount();
 
+        List<UserAccountModel> all = userAccountRepository.findAll();
         userAccountModelProvided = userAccountRepository.save(userAccountModelProvided);
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/" + userAccountModelProvided.getId());
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/" + userAccountModelProvided.getId())
+                .header("Authorization", "Bearer " + token);
 
         final RoleDTO roleDTOExpected = new RoleDTO();
         roleDTOExpected.setId(1L);
@@ -67,21 +59,22 @@ public class UserAccountControllerTest {
         final UserAccountDTO userAccountDTOExpected = new UserAccountDTO();
         userAccountDTOExpected.setRoles(List.of(roleDTOExpected));
         userAccountDTOExpected.setPassword("pass");
-        userAccountDTOExpected.setEmail("mail");
         userAccountDTOExpected.setUsername("name");
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.password").value(userAccountDTOExpected.getPassword()))
-                .andExpect(jsonPath("$.email").value(userAccountDTOExpected.getEmail()))
+                .andExpect(jsonPath("$.password").value(not(equalTo("pass"))))
                 .andExpect(jsonPath("$.username").value(userAccountDTOExpected.getUsername()));
     }
 
     @Test
     void getByIdTest_UserAccountNotFound() throws Exception {
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/999999999");
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/9999")
+                .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
                 .andExpect(status().isNotFound());
@@ -103,12 +96,15 @@ public class UserAccountControllerTest {
 
         userAccountRepository.save(userAccountModel2Provided);
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL);
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL)
+                .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[*].username", containsInAnyOrder("name", "name2")));
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[*].username", containsInAnyOrder("name", "name2", "test@example.com")));
     }
 
     @Test
@@ -119,20 +115,24 @@ public class UserAccountControllerTest {
                     "password": "pass",
                     "roles" : [
                         {
-                            "id": %d,
                             "name": "USER"
                         }
                     ]
                 }
                 """;
 
-        RoleModel roleModelProvided = new RoleModel();
+        final RoleModel roleModelProvided = new RoleModel();
         roleModelProvided.setName("USER");
-        roleModelProvided = roleRepository.save(roleModelProvided);
+        roleRepository.save(roleModelProvided);
 
-        mockMvc.perform(post(URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(String.format(userAccountJson, roleModelProvided.getId())))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userAccountJson)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
@@ -140,8 +140,7 @@ public class UserAccountControllerTest {
         final UserAccountModel userAccountModel = userAccountRepository.findByUsername("name1").orElseThrow();
 
         assertThat(userAccountModel.getUsername()).isEqualTo("name1");
-        assertThat(userAccountModel.getPassword()).isEqualTo("pass");
-        assertThat(userAccountModel.getEmail()).isNullOrEmpty();
+        assertThat(userAccountModel.getPassword()).isNotEqualTo("pass");
         assertThat(userAccountModel.getRoles()).hasSize(1);
     }
 
@@ -175,9 +174,14 @@ public class UserAccountControllerTest {
                 userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getId).orElse(null),
                 userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getName).orElse(""));
 
-        mockMvc.perform(post(URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userAccountJsonFormatted))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userAccountJsonFormatted)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isConflict());
     }
@@ -212,17 +216,21 @@ public class UserAccountControllerTest {
                 userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getId).orElse(null),
                 userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getName).orElse(""));
 
-        mockMvc.perform(post(URL + "/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userAccountJsonFormatted))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userAccountJsonFormatted)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
 
         final UserAccountModel userAccountModel = userAccountRepository.findByUsername("NewName").orElseThrow();
         assertThat(userAccountModel.getUsername()).isEqualTo("NewName");
-        assertThat(userAccountModel.getPassword()).isEqualTo("NewPass");
-        assertThat(userAccountModel.getEmail()).isNullOrEmpty();
+        assertThat(userAccountModel.getPassword()).isNotEqualTo("NewPass");
     }
 
     @Test
@@ -241,9 +249,14 @@ public class UserAccountControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post(URL + "/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userAccountJson))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userAccountJson)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
@@ -254,7 +267,12 @@ public class UserAccountControllerTest {
 
         userAccountModelProvided = userAccountRepository.save(userAccountModelProvided);
 
-        mockMvc.perform(get(URL + "/delete/" + userAccountModelProvided.getId()))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/" + userAccountModelProvided.getId())
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -264,7 +282,12 @@ public class UserAccountControllerTest {
 
     @Test
     void deleteUserAccountTest_UserAccountDoesNotExist() throws Exception {
-        mockMvc.perform(get(URL + "/delete/9999"))
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/9999")
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isForbidden());
 
@@ -272,13 +295,11 @@ public class UserAccountControllerTest {
 
     private UserAccountModel createUserAccount() {
         final RoleModel roleModel = new RoleModel();
-        roleModel.setId(1L);
         roleModel.setName("USER");
 
         UserAccountModel userAccountModel = new UserAccountModel();
         userAccountModel.setRoles(new HashSet<>(List.of(roleModel)));
-        userAccountModel.setPassword("pass");
-        userAccountModel.setEmail("mail");
+        userAccountModel.setPassword(passwordEncoder.encode("pass"));
         userAccountModel.setUsername("name");
 
         return userAccountModel;
