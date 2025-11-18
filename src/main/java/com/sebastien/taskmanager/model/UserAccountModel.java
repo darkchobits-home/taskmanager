@@ -8,6 +8,9 @@ import java.util.Set;
 
 @Data
 @Entity (name = "UserAccount")
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "uc_username", columnNames = {"username"})
+})
 public class UserAccountModel {
 
     @Id
