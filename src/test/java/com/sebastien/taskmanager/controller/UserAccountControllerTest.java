@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -112,7 +112,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
                     "password": "pass",
                     "roles" : [
                         {
-                            "name": "USER"
+                            "name": "ADMIN"
                         }
                     ]
                 }
@@ -204,8 +204,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
 
         final String userAccountJsonFormatted = String.format(userAccountJson,
                 userAccountModelProvided.getId(),
-                userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getId).orElse(null),
-                userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getName).orElse(""));
+                userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getName).orElse(null));
 
         final String token = generateToken();
 
@@ -233,7 +232,6 @@ public class UserAccountControllerTest extends GenericControllerTest {
                     "password": "NewPass",
                     "roles" : [
                         {
-                            "id": 1,
                             "name": "USER"
                         }
                     ]
@@ -285,12 +283,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
     }
 
     private UserAccountModel createUserAccount() {
-        RoleModel roleModel = new RoleModel();
-        roleModel.setName("USER");
-        roleModel = roleRepository.save(roleModel);
-
-        UserAccountModel userAccountModel = new UserAccountModel();
-        userAccountModel.setRoles(new HashSet<>(List.of(roleModel)));
+        final UserAccountModel userAccountModel = new UserAccountModel();
         userAccountModel.setPassword(passwordEncoder.encode("pass"));
         userAccountModel.setUsername("name");
 

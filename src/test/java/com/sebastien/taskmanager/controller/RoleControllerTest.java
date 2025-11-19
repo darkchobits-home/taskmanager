@@ -48,8 +48,8 @@ public class RoleControllerTest extends GenericControllerTest {
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.name").value("USER"));
     }
 

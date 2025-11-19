@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = TaskmanagerApplication.class)
-@TestPropertySource(locations = "classpath:application-integrationtest.yml")
+@TestPropertySource(locations = "classpath:application-test.yml")
 public class TaskServiceTest {
 
     @Autowired

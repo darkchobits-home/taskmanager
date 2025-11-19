@@ -15,7 +15,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.yml")
 @Transactional
 public class GenericControllerTest {
 
@@ -39,12 +42,16 @@ public class GenericControllerTest {
     private JwtService jwtService;
 
     private final String USERNAME = "test@example.com";
+
     private final String USER_ROLE_ADMIN = "ADMIN";
 
     @BeforeEach
-    void setup() {
-        roleRepository.deleteAll();
+    void setup() throws SQLException {
         userAccountRepository.deleteAll();
+        userAccountRepository.flush();
+
+        roleRepository.deleteAll();
+        roleRepository.flush();
 
         RoleModel roleModel = new RoleModel();
         roleModel.setName(USER_ROLE_ADMIN);

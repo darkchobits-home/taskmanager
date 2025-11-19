@@ -3,6 +3,8 @@ package com.sebastien.taskmanager.service;
 import com.sebastien.taskmanager.converter.useraccount.UserAccountEntityToModelConverter;
 import com.sebastien.taskmanager.converter.useraccount.UserAccountModelToEntityConverter;
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
+import com.sebastien.taskmanager.exceptions.RoleException;
+import com.sebastien.taskmanager.exceptions.RoleExceptionCode;
 import com.sebastien.taskmanager.exceptions.UserAccountException;
 import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
 import com.sebastien.taskmanager.model.RoleModel;
@@ -117,19 +119,27 @@ public class UserAccountService {
      * @return The id of the user account updated.
      */
     public Optional<Long> updateUserAccount(UserAccount userAccount) {
-        Optional<UserAccountModel> userAccountModelOptional = userAccountRepository.findById(userAccount.getId());
-
-        if (userAccountModelOptional.isEmpty()) {
+        UserAccountModel userAccountModel = userAccountRepository.findById(userAccount.getId()).orElseThrow(() -> {
             final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
             userAccountException.getDetails().put("Id", String.valueOf(userAccount.getId()));
             userAccountException.getDetails().put("Username", userAccount.getUsername());
 
-            throw userAccountException;
-        }
+            return userAccountException;
+        });
 
         final UserAccountModel userAccountModelToSave =  userAccountEntityToModelConverter.convert(userAccount, UserAccountModel.class);
-        userAccountModelToSave.setId(userAccountModelOptional.get().getId());
+        userAccountModelToSave.setId(userAccountModel.getId());
+        Set<RoleModel> roleModelSet = userAccountModelToSave.getRoles().stream()
+                .map(roleModel -> roleRepository.findByName(roleModel.getName()).orElseThrow( () -> {
 
+                        final RoleException roleException = new RoleException(RoleExceptionCode.ROLE_NOT_FOUND);
+                        roleException.getDetails().put("Name", roleModel.getName());
+
+                        return roleException;
+                    }))
+                .collect(Collectors.toSet());
+
+        userAccountModelToSave.setRoles(roleModelSet);
 
         return save(userAccountModelToSave);
     }

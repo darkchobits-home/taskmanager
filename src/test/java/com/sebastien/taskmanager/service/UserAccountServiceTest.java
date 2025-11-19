@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = TaskmanagerApplication.class)
-@TestPropertySource(locations = "classpath:application-integrationtest.yml")
+@TestPropertySource(locations = "classpath:application-test.yml")
 public class UserAccountServiceTest {
 
     @Autowired
@@ -33,6 +34,9 @@ public class UserAccountServiceTest {
 
     @MockitoBean
     private UserAccountRepository userAccountRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static UserAccountModel createUserAccountModel() {
         final RoleModel roleModel = new RoleModel();
@@ -42,7 +46,6 @@ public class UserAccountServiceTest {
         final UserAccountModel userAccountModel = new UserAccountModel();
         userAccountModel.setId(1L);
         userAccountModel.setUsername("email@user1.com");
-        userAccountModel.setUsername("name1");
         userAccountModel.setPassword("pass1");
         userAccountModel.setRoles(new HashSet<>(List.of(roleModel)));
 
@@ -78,8 +81,7 @@ public class UserAccountServiceTest {
 
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setUsername("email@user1.com");
-        userAccount1Provided.setUsername("name1");
-        userAccount1Provided.setPassword("pass1");
+        userAccount1Provided.setPassword(passwordEncoder.encode("pass1"));
         userAccount1Provided.setRoles(new HashSet<>(List.of(role1Provided)));
 
         // Then
@@ -97,8 +99,7 @@ public class UserAccountServiceTest {
 
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setUsername("email@user1.com");
-        userAccount1Provided.setUsername("name1");
-        userAccount1Provided.setPassword("pass1");
+        userAccount1Provided.setPassword(passwordEncoder.encode("pass1"));
         userAccount1Provided.setRoles(new HashSet<>());
 
         // Then
@@ -121,8 +122,7 @@ public class UserAccountServiceTest {
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setId(1L);
         userAccount1Provided.setUsername("email@user1.com");
-        userAccount1Provided.setUsername("name1");
-        userAccount1Provided.setPassword("pass1");
+        userAccount1Provided.setPassword(passwordEncoder.encode("pass1"));
         userAccount1Provided.setRoles(new HashSet<>(List.of(role1Provided)));
 
         // Then
