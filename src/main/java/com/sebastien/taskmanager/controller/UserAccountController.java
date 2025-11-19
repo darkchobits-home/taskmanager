@@ -88,7 +88,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "200", description = "Successfully updated."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<Long> updateUser(@RequestBody UserAccountUpdateDTO userAccountUpdateDTO) {
 
         final UserAccount userAccount = userAccountDtoToEntityConverter.convertUpdateDtoToEntity(userAccountUpdateDTO);
@@ -106,7 +106,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "200", description = "Successfully deleted."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @GetMapping("/delete/{userAccountId}")
+    @DeleteMapping("/delete/{userAccountId}")
     public ResponseEntity<Long> deleteUser(@PathVariable @NotNull Long userAccountId) {
         userAccountService.deleteUserAccount(userAccountId);
 

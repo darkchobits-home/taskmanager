@@ -22,9 +22,5 @@ public class AuthController {
 
         return ResponseEntity.ok(authResponse);
     }
-
-    @GetMapping("/ping")
-    public String ping() {
-        return "pong";
-    }
+    
 }

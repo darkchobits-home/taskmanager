@@ -84,7 +84,7 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Successfully updated."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<Long> updateRole(@RequestBody RoleUpdateDTO roleUpdateDTO) {
         final Role role = roleDtoToEntityConverter.convertUpdateDtoToEntity(roleUpdateDTO);
         final Optional<Long> roleIdOptional = roleService.updateRole(role);
@@ -99,7 +99,7 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Successfully deleted."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @GetMapping("/delete/{roleId}")
+    @DeleteMapping("/delete/{roleId}")
     public ResponseEntity<Long> deleteRole(@PathVariable @NotNull Long roleId) {
         roleService.deleteRole(roleId);
 

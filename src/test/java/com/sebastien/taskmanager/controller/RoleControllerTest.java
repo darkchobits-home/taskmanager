@@ -148,7 +148,7 @@ public class RoleControllerTest extends GenericControllerTest {
                 """;
 
         final String token = generateToken();
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.put(URL + "/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format(roleJson, roleModel1Provided.getId()))
                 .header("Authorization", "Bearer " + token);
@@ -172,7 +172,7 @@ public class RoleControllerTest extends GenericControllerTest {
                     }
                 """;
         final String token = generateToken();
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.put(URL + "/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(roleJson)
                 .header("Authorization", "Bearer " + token);
@@ -190,7 +190,7 @@ public class RoleControllerTest extends GenericControllerTest {
         roleModel1Provided = roleRepository.save(roleModel1Provided);
 
         final String token = generateToken();
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/" + roleModel1Provided.getId())
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.delete(URL + "/delete/" + roleModel1Provided.getId())
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
@@ -204,7 +204,7 @@ public class RoleControllerTest extends GenericControllerTest {
     @Test
     void deleteRoleTest_RoleDoesNotExist() throws Exception {
         final String token = generateToken();
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/9999")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.delete(URL + "/delete/9999")
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)

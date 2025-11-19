@@ -79,7 +79,7 @@ public class TaskController {
             @ApiResponse(responseCode = "200", description = "Successfully updated."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<Long> updateTask(@RequestBody TaskUpdateDTO taskUpdateDTO) {
         final Task task = taskDtoToEntityConverter.convertUpdateDtoToEntity(taskUpdateDTO);
         final Optional<Long> taskId = taskService.updateTask(task);
@@ -92,8 +92,8 @@ public class TaskController {
             @ApiResponse(responseCode = "200", description = "Successfully deleted."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @GetMapping("/delete/{taskId}")
-    public ResponseEntity<Long> deleteRole(@PathVariable @NotNull Long taskId) {
+    @DeleteMapping("/delete/{taskId}")
+    public ResponseEntity<Long> deleteTask(@PathVariable @NotNull Long taskId) {
         taskService.deleteTask(taskId);
 
         return ResponseEntity.ok(taskId);

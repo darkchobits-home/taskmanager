@@ -143,7 +143,7 @@ public class TaskControllerTest extends GenericControllerTest {
 
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.put(URL + "/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format(taskJson, taskModelProvided.getId()))
                 .header("Authorization", "Bearer " + token);
@@ -173,7 +173,7 @@ public class TaskControllerTest extends GenericControllerTest {
 
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.put(URL + "/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(taskJson)
                 .header("Authorization", "Bearer " + token);
@@ -191,7 +191,7 @@ public class TaskControllerTest extends GenericControllerTest {
 
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/" + taskModelProvided.getId())
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.delete(URL + "/delete/" + taskModelProvided.getId())
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
@@ -206,7 +206,7 @@ public class TaskControllerTest extends GenericControllerTest {
     void deleteTaskTest_TaskDoesNotExist() throws Exception {
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/9999")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.delete(URL + "/delete/9999")
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)

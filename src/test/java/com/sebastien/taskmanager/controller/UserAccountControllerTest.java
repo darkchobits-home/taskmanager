@@ -208,7 +208,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
 
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.put(URL + "/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userAccountJsonFormatted)
                 .header("Authorization", "Bearer " + token);
@@ -240,7 +240,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
 
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL + "/update")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.put(URL + "/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userAccountJson)
                 .header("Authorization", "Bearer " + token);
@@ -258,7 +258,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
 
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/" + userAccountModelProvided.getId())
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.delete(URL + "/delete/" + userAccountModelProvided.getId())
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
@@ -273,7 +273,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
     void deleteUserAccountTest_UserAccountDoesNotExist() throws Exception {
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/delete/9999")
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.delete(URL + "/delete/9999")
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
