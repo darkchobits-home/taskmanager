@@ -70,8 +70,6 @@ public class UserAccountService {
                 .collect(Collectors.toSet());
         userAccountModelToSave.setRoles(roleModelSet);
 
-
-
         return save(userAccountModelToSave);
     }
 

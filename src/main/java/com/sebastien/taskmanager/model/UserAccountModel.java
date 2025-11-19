@@ -1,5 +1,6 @@
 package com.sebastien.taskmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,8 +20,9 @@ public class UserAccountModel {
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<RoleModel> roles = new HashSet<>();
 }

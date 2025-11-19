@@ -11,7 +11,5 @@ public class UserAccountDTO {
 
     private String username;
 
-    private String password;
-
     private List<RoleDTO> roles;
 }

@@ -39,7 +39,7 @@ public class GenericControllerTest {
     private JwtService jwtService;
 
     private final String USERNAME = "test@example.com";
-    private final String USER_ROLE = "ADMIN";
+    private final String USER_ROLE_ADMIN = "ADMIN";
 
     @BeforeEach
     void setup() {
@@ -47,7 +47,7 @@ public class GenericControllerTest {
         userAccountRepository.deleteAll();
 
         RoleModel roleModel = new RoleModel();
-        roleModel.setName(USER_ROLE);
+        roleModel.setName(USER_ROLE_ADMIN);
 
         roleModel = roleRepository.save(roleModel);
 
@@ -60,7 +60,6 @@ public class GenericControllerTest {
     }
 
     protected String generateToken() {
-        List<UserAccountModel> all = userAccountRepository.findAll();
         final UserAccountModel userAccountModel = userAccountRepository.findByUsername(USERNAME).orElseThrow();
         final UserDetails userDetails = new User(userAccountModel.getUsername(),
                 userAccountModel.getPassword(),

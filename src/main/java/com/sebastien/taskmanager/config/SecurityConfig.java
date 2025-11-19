@@ -27,7 +27,6 @@ public class SecurityConfig {
     private final CustomUserDetailService customUserDetailService;
 
     public SecurityConfig(OncePerRequestFilter jwtAuthenticationFilter, CustomUserDetailService customUserDetailService, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
-        System.out.println("SecurityConfig: Filter bean = " + jwtAuthenticationFilter.getClass());
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.customUserDetailService = customUserDetailService;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;

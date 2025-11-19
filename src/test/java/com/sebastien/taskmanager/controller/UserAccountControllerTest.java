@@ -53,19 +53,16 @@ public class UserAccountControllerTest extends GenericControllerTest {
                 .header("Authorization", "Bearer " + token);
 
         final RoleDTO roleDTOExpected = new RoleDTO();
-        roleDTOExpected.setId(1L);
         roleDTOExpected.setName("USER");
 
         final UserAccountDTO userAccountDTOExpected = new UserAccountDTO();
         userAccountDTOExpected.setRoles(List.of(roleDTOExpected));
-        userAccountDTOExpected.setPassword("pass");
         userAccountDTOExpected.setUsername("name");
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.password").value(not(equalTo("pass"))))
                 .andExpect(jsonPath("$.username").value(userAccountDTOExpected.getUsername()));
     }
 
@@ -121,10 +118,6 @@ public class UserAccountControllerTest extends GenericControllerTest {
                 }
                 """;
 
-        final RoleModel roleModelProvided = new RoleModel();
-        roleModelProvided.setName("USER");
-        roleRepository.save(roleModelProvided);
-
         final String token = generateToken();
 
         final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL)
@@ -161,7 +154,6 @@ public class UserAccountControllerTest extends GenericControllerTest {
                     "password": "%s",
                     "roles" : [
                         {
-                            "id": %d,
                             "name": "%s"
                         }
                     ]
@@ -204,7 +196,6 @@ public class UserAccountControllerTest extends GenericControllerTest {
                     "password": "NewPass",
                     "roles" : [
                         {
-                            "id": %d,
                             "name": "%s"
                         }
                     ]
@@ -294,8 +285,9 @@ public class UserAccountControllerTest extends GenericControllerTest {
     }
 
     private UserAccountModel createUserAccount() {
-        final RoleModel roleModel = new RoleModel();
+        RoleModel roleModel = new RoleModel();
         roleModel.setName("USER");
+        roleModel = roleRepository.save(roleModel);
 
         UserAccountModel userAccountModel = new UserAccountModel();
         userAccountModel.setRoles(new HashSet<>(List.of(roleModel)));
