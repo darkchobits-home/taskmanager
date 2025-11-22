@@ -4,7 +4,6 @@ import com.sebastien.taskmanager.dto.task.TaskCreationDTO;
 import com.sebastien.taskmanager.dto.task.TaskDTO;
 import com.sebastien.taskmanager.dto.task.TaskUpdateDTO;
 import com.sebastien.taskmanager.entity.task.Task;
-import com.sebastien.taskmanager.enums.Status;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,10 +13,7 @@ public class TaskDtoToEntityConverter {
     private ModelMapper modelMapper;
 
     public Task convertCreationDtoToEntity(TaskCreationDTO taskCreationDTO) {
-        Task task = modelMapper.map(taskCreationDTO, Task.class);
-        task.setStatus(Status.CREATED);
-
-        return task;
+        return modelMapper.map(taskCreationDTO, Task.class);
     }
 
     public Task convertUpdateDtoToEntity(TaskUpdateDTO taskUpdateDTO) {

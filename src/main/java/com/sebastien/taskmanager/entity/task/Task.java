@@ -1,12 +1,12 @@
 package com.sebastien.taskmanager.entity.task;
 
+import com.sebastien.taskmanager.entity.useraccount.UserAccount;
+import com.sebastien.taskmanager.enums.Priority;
 import com.sebastien.taskmanager.enums.Status;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class Task {
@@ -17,9 +17,15 @@ public class Task {
 
     private String description;
 
-    @DateTimeFormat(pattern = "YYYY-MM-DD")
-    private LocalDate dueDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime createdAt;
 
-    @Enumerated(EnumType.STRING)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime updatedAt;
+
     private Status status;
+
+    private Priority priority;
+
+    private UserAccount assignedTo;
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 @Table(uniqueConstraints = {
         @UniqueConstraint(name = "uc_username", columnNames = {"username"})
 })
-public class UserAccountModel {
+public class UserAccountModel implements Serializable {
 
     @Id
     @GeneratedValue

@@ -5,8 +5,12 @@ import com.sebastien.taskmanager.converter.task.TaskModelToEntityConverter;
 import com.sebastien.taskmanager.entity.task.Task;
 import com.sebastien.taskmanager.exceptions.TaskException;
 import com.sebastien.taskmanager.exceptions.TaskExceptionCode;
+import com.sebastien.taskmanager.exceptions.UserAccountException;
+import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
 import com.sebastien.taskmanager.model.TaskModel;
+import com.sebastien.taskmanager.model.UserAccountModel;
 import com.sebastien.taskmanager.repository.TaskRepository;
+import com.sebastien.taskmanager.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,9 @@ public class TaskService {
     @Autowired
     @SuppressWarnings("unused")
     private TaskRepository taskRepository;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
 
     @Autowired
     @SuppressWarnings("unused")
@@ -41,6 +48,17 @@ public class TaskService {
      */
     public Optional<Long> createTask(Task task){
         final TaskModel taskModel = taskEntityToModelConverter.convertEntityToModel(task);
+
+        // Get UserAccountModel
+        if (task.getAssignedTo() != null) {
+            UserAccountModel userAccountModel = userAccountRepository.findByUsername(task.getAssignedTo().getUsername()).orElseThrow(() -> {
+                final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
+                userAccountException.getDetails().put("Username", task.getAssignedTo().getUsername());
+
+                return userAccountException;
+            });
+            taskModel.setAssignedTo(userAccountModel);
+        }
 
         return save(taskModel);
     }
@@ -75,18 +93,28 @@ public class TaskService {
      * @return The id of the Task updated.
      */
     public Optional<Long> updateTask(final Task task) {
-        final Optional<TaskModel> existingTask = taskRepository.findById(task.getId());
-
-        if (existingTask.isEmpty()) {
+        TaskModel existingTask = taskRepository.findById(task.getId()).orElseThrow(() -> {
             final TaskException taskException = new TaskException(TaskExceptionCode.TASK_ID_DOES_NOT_EXIST);
             taskException.getDetails().put("TaskId", String.valueOf(task.getId()));
 
-            throw taskException;
-        }
-
+            return taskException;
+        });
 
         final TaskModel taskModelToUpdate = taskEntityToModelConverter.convertEntityToModel(task);
-        taskModelToUpdate.setId(existingTask.get().getId());
+        taskModelToUpdate.setId(existingTask.getId());
+
+        if (existingTask.getAssignedTo() != null) {
+            final String username = existingTask.getAssignedTo().getUsername();
+
+            UserAccountModel userAccountModel = userAccountRepository.findByUsername(username).orElseThrow(() -> {
+                final UserAccountException userAccountException = new UserAccountException(UserAccountExceptionCode.USER_ACCOUNT_NOT_FOUND);
+                userAccountException.getDetails().put("Username", username);
+
+                return userAccountException;
+            });
+
+            taskModelToUpdate.setAssignedTo(userAccountModel);
+        }
 
         return save(taskModelToUpdate);
     }

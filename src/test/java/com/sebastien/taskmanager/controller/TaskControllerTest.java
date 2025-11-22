@@ -8,17 +8,17 @@ import com.sebastien.taskmanager.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.modelmapper.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,9 +28,6 @@ public class TaskControllerTest extends GenericControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private TaskRepository taskRepository;
@@ -54,8 +51,8 @@ public class TaskControllerTest extends GenericControllerTest {
         final TaskDTO taskDTOExpected = new TaskDTO();
         taskDTOExpected.setTitle("Title");
         taskDTOExpected.setDescription("Description");
-        taskDTOExpected.setStatus(Status.CREATED);
-        taskDTOExpected.setDueDate(LocalDate.now());
+        taskDTOExpected.setStatus(Status.TODO);
+        taskDTOExpected.setCreatedAt(LocalDateTime.of(2025, 11, 20, 11, 34, 28));
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
@@ -63,7 +60,7 @@ public class TaskControllerTest extends GenericControllerTest {
                 .andExpect(jsonPath("$.title").value(taskDTOExpected.getTitle()))
                 .andExpect(jsonPath("$.description").value(taskDTOExpected.getDescription()))
                 .andExpect(jsonPath("$.status").value(taskDTOExpected.getStatus().toString()))
-                .andExpect(jsonPath("$.dueDate").isNotEmpty());
+                .andExpect(jsonPath("$.createdAt", is(LocalDateTime.of(2025, 11, 20, 11, 34, 28))).exists());
     }
 
     @Test
@@ -105,7 +102,8 @@ public class TaskControllerTest extends GenericControllerTest {
                 {
                     "title": "Task 1",
                     "description": "Ceci est la task numero 1",
-                    "dueDate": "2025-11-17"
+                    "createdAt": "2025-11-17T17:34:28.000",
+                    "status": "TODO"
                 }
                 """;
 
@@ -137,7 +135,7 @@ public class TaskControllerTest extends GenericControllerTest {
                     "id": %d,
                     "title": "Task 1",
                     "description": "Ceci est la task numero 1",
-                    "dueDate": "2025-11-17"
+                    "createdAt": "%s"
                 }
                 """;
 
@@ -145,7 +143,7 @@ public class TaskControllerTest extends GenericControllerTest {
 
         final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.put(URL + "/update")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(String.format(taskJson, taskModelProvided.getId()))
+                .content(String.format(taskJson, taskModelProvided.getId(), taskModelProvided.getCreatedAt()))
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
@@ -154,10 +152,11 @@ public class TaskControllerTest extends GenericControllerTest {
                 .andExpect(jsonPath("$").isNumber());
 
         final TaskModel taskModel = taskRepository.findById(taskModelProvided.getId()).orElseThrow();
+        assertThat(taskModel).isNotNull();
         assertThat(taskModel.getId()).isNotNull();
         assertThat(taskModel.getTitle()).isEqualTo("Task 1");
         assertThat(taskModel.getDescription()).isEqualTo("Ceci est la task numero 1");
-        assertThat(taskModel.getDueDate()).isNotNull();
+        assertThat(taskModel.getCreatedAt()).isNotNull();
     }
 
     @Test
@@ -219,8 +218,8 @@ public class TaskControllerTest extends GenericControllerTest {
         final TaskModel taskModel = new TaskModel();
         taskModel.setTitle("Title");
         taskModel.setDescription("Description");
-        taskModel.setStatus(Status.CREATED);
-        taskModel.setDueDate(LocalDate.now());
+        taskModel.setStatus(Status.TODO);
+        taskModel.setCreatedAt(LocalDateTime.of(2025, 11, 20, 11, 34, 28));
 
         return taskModel;
     }

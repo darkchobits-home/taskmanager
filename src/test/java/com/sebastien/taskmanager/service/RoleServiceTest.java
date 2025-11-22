@@ -1,6 +1,5 @@
 package com.sebastien.taskmanager.service;
 
-import com.sebastien.taskmanager.TaskmanagerApplication;
 import com.sebastien.taskmanager.entity.role.Role;
 import com.sebastien.taskmanager.exceptions.RoleException;
 import com.sebastien.taskmanager.exceptions.RoleExceptionCode;
@@ -20,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = TaskmanagerApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestPropertySource(locations = "classpath:application-test.yml")
 public class RoleServiceTest {
 

@@ -16,8 +16,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+
 @Configuration
 @EnableWebSecurity
+//@Profile("!test")
 public class SecurityConfig {
 
     private final OncePerRequestFilter jwtAuthenticationFilter;

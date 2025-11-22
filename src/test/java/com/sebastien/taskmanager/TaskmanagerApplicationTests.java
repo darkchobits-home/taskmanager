@@ -8,7 +8,7 @@ import org.springframework.test.context.TestPropertySource;
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = TaskmanagerApplication.class)
 @TestPropertySource(locations = "classpath:application-test.yml")
-class TaskmanagerApplicationTests {
+public class TaskmanagerApplicationTests {
 
 	@Test
 	void contextLoads() {

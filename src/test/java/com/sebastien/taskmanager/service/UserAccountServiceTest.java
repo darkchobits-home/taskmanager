@@ -1,6 +1,5 @@
 package com.sebastien.taskmanager.service;
 
-import com.sebastien.taskmanager.TaskmanagerApplication;
 import com.sebastien.taskmanager.entity.role.Role;
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
 import com.sebastien.taskmanager.exceptions.UserAccountException;
@@ -25,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = TaskmanagerApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestPropertySource(locations = "classpath:application-test.yml")
 public class UserAccountServiceTest {
 
@@ -36,7 +35,7 @@ public class UserAccountServiceTest {
     private UserAccountRepository userAccountRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoderForTest;
 
     private static UserAccountModel createUserAccountModel() {
         final RoleModel roleModel = new RoleModel();
@@ -81,7 +80,7 @@ public class UserAccountServiceTest {
 
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setUsername("email@user1.com");
-        userAccount1Provided.setPassword(passwordEncoder.encode("pass1"));
+        userAccount1Provided.setPassword(passwordEncoderForTest.encode("pass1"));
         userAccount1Provided.setRoles(new HashSet<>(List.of(role1Provided)));
 
         // Then
@@ -99,7 +98,7 @@ public class UserAccountServiceTest {
 
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setUsername("email@user1.com");
-        userAccount1Provided.setPassword(passwordEncoder.encode("pass1"));
+        userAccount1Provided.setPassword(passwordEncoderForTest.encode("pass1"));
         userAccount1Provided.setRoles(new HashSet<>());
 
         // Then
@@ -122,7 +121,7 @@ public class UserAccountServiceTest {
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setId(1L);
         userAccount1Provided.setUsername("email@user1.com");
-        userAccount1Provided.setPassword(passwordEncoder.encode("pass1"));
+        userAccount1Provided.setPassword(passwordEncoderForTest.encode("pass1"));
         userAccount1Provided.setRoles(new HashSet<>(List.of(role1Provided)));
 
         // Then

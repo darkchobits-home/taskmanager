@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestPropertySource(locations = "classpath:application-test.yml")
 @Transactional
 public class GenericControllerTest {
@@ -77,3 +77,4 @@ public class GenericControllerTest {
         return jwtService.generateToken(userDetails);
     }
 }
+

@@ -2,9 +2,7 @@ package com.sebastien.taskmanager.enums;
 
 
 public enum Status {
-    CREATED,
+    TODO,
     IN_PROGRESS,
-    PAUSED,
-    ABORTED,
-    FINISHED
+    DONE
 }

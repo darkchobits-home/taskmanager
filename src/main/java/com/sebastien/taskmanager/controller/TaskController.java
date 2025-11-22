@@ -6,6 +6,7 @@ import com.sebastien.taskmanager.dto.task.TaskCreationDTO;
 import com.sebastien.taskmanager.dto.task.TaskDTO;
 import com.sebastien.taskmanager.dto.task.TaskUpdateDTO;
 import com.sebastien.taskmanager.entity.task.Task;
+import com.sebastien.taskmanager.enums.Priority;
 import com.sebastien.taskmanager.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,6 +46,11 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<Long> createTask(@RequestBody TaskCreationDTO taskCreationDTO) {
         final Task task = taskDtoToEntityConverter.convertCreationDtoToEntity(taskCreationDTO);
+
+        if (taskCreationDTO.getPriority() == null) {
+            task.setPriority(Priority.LOW);
+        }
+
         final Optional<Long> taskId = taskService.createTask(task);
 
         return taskId.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
