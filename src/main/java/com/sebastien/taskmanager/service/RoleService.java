@@ -3,6 +3,7 @@ package com.sebastien.taskmanager.service;
 import com.sebastien.taskmanager.converter.role.RoleEntityToModelConverter;
 import com.sebastien.taskmanager.converter.role.RoleModelToEntityConverter;
 import com.sebastien.taskmanager.entity.role.Role;
+import com.sebastien.taskmanager.enums.RoleEnum;
 import com.sebastien.taskmanager.exceptions.RoleException;
 import com.sebastien.taskmanager.exceptions.RoleExceptionCode;
 import com.sebastien.taskmanager.model.RoleModel;
@@ -41,7 +42,7 @@ public class RoleService {
         final Optional<RoleModel> roleModelOptional = roleRepository.findByName(role.getName());
         if (roleModelOptional.isPresent()) {
             final RoleException roleException = new RoleException(RoleExceptionCode.ROLE_NAME_ALREADY_EXISTS);
-            roleException.getDetails().put("Name", role.getName());
+            roleException.getDetails().put("Name", role.getName().name());
 
             throw roleException;
         }
@@ -82,12 +83,12 @@ public class RoleService {
      * @param name The name of the role.
      * @return The role found, or an Optional.empty().
      */
-    public Optional<Role> getByName(String name) {
+    public Optional<Role> getByName(RoleEnum name) {
         final Optional<RoleModel> roleModelOptional = roleRepository.findByName(name);
 
         if (roleModelOptional.isEmpty()) {
             final RoleException RoleException = new RoleException(RoleExceptionCode.ROLE_NOT_FOUND);
-            RoleException.getDetails().put("Name", name);
+            RoleException.getDetails().put("Name", name.name());
         }
 
         return roleModelOptional.map(roleModel -> roleModelToEntityConverter.convert(roleModel, Role.class));
@@ -105,7 +106,7 @@ public class RoleService {
         if (RoleModelOptional.isEmpty()) {
             final RoleException RoleException = new RoleException(RoleExceptionCode.ROLE_ID_DOES_NOT_EXIST);
             RoleException.getDetails().put("id", String.valueOf(role.getId()));
-            RoleException.getDetails().put("name", role.getName());
+            RoleException.getDetails().put("name", role.getName().name());
 
             throw RoleException;
         }

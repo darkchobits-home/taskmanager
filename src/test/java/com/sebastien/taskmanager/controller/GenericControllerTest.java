@@ -1,5 +1,6 @@
 package com.sebastien.taskmanager.controller;
 
+import com.sebastien.taskmanager.enums.RoleEnum;
 import com.sebastien.taskmanager.model.RoleModel;
 import com.sebastien.taskmanager.model.UserAccountModel;
 import com.sebastien.taskmanager.repository.RoleRepository;
@@ -43,7 +44,7 @@ public class GenericControllerTest {
 
     private final String USERNAME = "test@example.com";
 
-    private final String USER_ROLE_ADMIN = "ADMIN";
+    private final RoleEnum ROLE_ADMIN = RoleEnum.ADMIN;
 
     @BeforeEach
     void setup() throws SQLException {
@@ -54,7 +55,7 @@ public class GenericControllerTest {
         roleRepository.flush();
 
         RoleModel roleModel = new RoleModel();
-        roleModel.setName(USER_ROLE_ADMIN);
+        roleModel.setName(ROLE_ADMIN);
 
         roleModel = roleRepository.save(roleModel);
 

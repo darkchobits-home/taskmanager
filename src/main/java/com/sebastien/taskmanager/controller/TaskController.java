@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -44,6 +45,7 @@ public class TaskController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @PostMapping
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<Long> createTask(@RequestBody TaskCreationDTO taskCreationDTO) {
         final Task task = taskDtoToEntityConverter.convertCreationDtoToEntity(taskCreationDTO);
 
@@ -62,6 +64,7 @@ public class TaskController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @GetMapping
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public Set<TaskDTO> getAll() {
         final Set<Task> allTasks = taskService.getAll();
 
@@ -74,6 +77,7 @@ public class TaskController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @GetMapping("/{id}")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<TaskDTO> getById(@PathVariable @NotNull Long id) {
         final Optional<Task> taskOptional = taskService.getById(id);
 
@@ -86,6 +90,7 @@ public class TaskController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @PutMapping("/update")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<Long> updateTask(@RequestBody TaskUpdateDTO taskUpdateDTO) {
         final Task task = taskDtoToEntityConverter.convertUpdateDtoToEntity(taskUpdateDTO);
         final Optional<Long> taskId = taskService.updateTask(task);
@@ -99,6 +104,7 @@ public class TaskController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @DeleteMapping("/delete/{taskId}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Long> deleteTask(@PathVariable @NotNull Long taskId) {
         taskService.deleteTask(taskId);
 

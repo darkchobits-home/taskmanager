@@ -2,6 +2,7 @@ package com.sebastien.taskmanager.service;
 
 import com.sebastien.taskmanager.entity.role.Role;
 import com.sebastien.taskmanager.entity.useraccount.UserAccount;
+import com.sebastien.taskmanager.enums.RoleEnum;
 import com.sebastien.taskmanager.exceptions.UserAccountException;
 import com.sebastien.taskmanager.exceptions.UserAccountExceptionCode;
 import com.sebastien.taskmanager.model.RoleModel;
@@ -40,7 +41,7 @@ public class UserAccountServiceTest {
     private static UserAccountModel createUserAccountModel() {
         final RoleModel roleModel = new RoleModel();
         roleModel.setId(1L);
-        roleModel.setName("USER");
+        roleModel.setName(RoleEnum.USER);
 
         final UserAccountModel userAccountModel = new UserAccountModel();
         userAccountModel.setId(1L);
@@ -76,7 +77,7 @@ public class UserAccountServiceTest {
 
         final Role role1Provided = new Role();
         role1Provided.setId(1L);
-        role1Provided.setName("USER");
+        role1Provided.setName(RoleEnum.USER);
 
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setUsername("email@user1.com");
@@ -116,7 +117,7 @@ public class UserAccountServiceTest {
 
         final Role role1Provided = new Role();
         role1Provided.setId(1L);
-        role1Provided.setName("USER");
+        role1Provided.setName(RoleEnum.USER);
 
         final UserAccount userAccount1Provided = new UserAccount();
         userAccount1Provided.setId(1L);

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +48,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @PostMapping
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Long> createUser(@RequestBody UserAccountCreationDTO userAccountCreationDTO) {
 
         final UserAccount userAccount = userAccountDtoToEntityConverter.convertCreationDtoToEntity(userAccountCreationDTO);
@@ -65,6 +67,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @GetMapping
+    @Secured("ROLE_ADMIN")
     public Set<UserAccountDTO> getAll() {
         final Set<UserAccount> allUserAccount = userAccountService.getAll();
 
@@ -77,6 +80,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @GetMapping("/{id}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<UserAccountDTO> getById(@PathVariable @NotNull Long id) {
         final Optional<UserAccount> userAccountOptional = userAccountService.getById(id);
 
@@ -89,6 +93,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @PutMapping("/update")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Long> updateUser(@RequestBody UserAccountUpdateDTO userAccountUpdateDTO) {
 
         final UserAccount userAccount = userAccountDtoToEntityConverter.convertUpdateDtoToEntity(userAccountUpdateDTO);
@@ -107,6 +112,7 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @DeleteMapping("/delete/{userAccountId}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Long> deleteUser(@PathVariable @NotNull Long userAccountId) {
         userAccountService.deleteUserAccount(userAccountId);
 

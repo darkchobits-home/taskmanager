@@ -133,7 +133,7 @@ public class UserAccountService {
                 .map(roleModel -> roleRepository.findByName(roleModel.getName()).orElseThrow( () -> {
 
                         final RoleException roleException = new RoleException(RoleExceptionCode.ROLE_NOT_FOUND);
-                        roleException.getDetails().put("Name", roleModel.getName());
+                        roleException.getDetails().put("Name", roleModel.getName().name());
 
                         return roleException;
                     }))

@@ -1,6 +1,7 @@
 package com.sebastien.taskmanager.service;
 
 import com.sebastien.taskmanager.entity.role.Role;
+import com.sebastien.taskmanager.enums.RoleEnum;
 import com.sebastien.taskmanager.exceptions.RoleException;
 import com.sebastien.taskmanager.exceptions.RoleExceptionCode;
 import com.sebastien.taskmanager.model.RoleModel;
@@ -51,12 +52,12 @@ public class RoleServiceTest {
     public void testCreateRole_NameAlreadyExist() {
         // When
         final RoleModel roleModelProvided = new RoleModel();
-        roleModelProvided.setName("USER");
+        roleModelProvided.setName(RoleEnum.USER);
 
-        Mockito.when(roleRepository.findByName(roleModelProvided.getName())).thenReturn(Optional.of(roleModelProvided));
+        Mockito.when(roleRepository.findByName(RoleEnum.USER)).thenReturn(Optional.of(roleModelProvided));
 
         final Role roleProvided = new Role();
-        roleProvided.setName("USER");
+        roleProvided.setName(RoleEnum.USER);
 
         // Then
         final RoleException roleExceptionResult = assertThrows(RoleException.class, () -> roleService.createRole(roleProvided));
@@ -73,7 +74,7 @@ public class RoleServiceTest {
 
         final Role roleProvided = new Role();
         roleProvided.setId(1L);
-        roleProvided.setName("USER");
+        roleProvided.setName(RoleEnum.USER);
 
         // Then
         final RoleException roleExceptionResult = assertThrows(RoleException.class, () -> roleService.updateRole(roleProvided));

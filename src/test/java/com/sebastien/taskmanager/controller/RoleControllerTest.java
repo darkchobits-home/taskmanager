@@ -1,5 +1,6 @@
 package com.sebastien.taskmanager.controller;
 
+import com.sebastien.taskmanager.enums.RoleEnum;
 import com.sebastien.taskmanager.model.RoleModel;
 import com.sebastien.taskmanager.repository.RoleRepository;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ public class RoleControllerTest extends GenericControllerTest {
     @Test
     void getByIdTest() throws Exception {
         RoleModel roleModelProvided = new RoleModel();
-        roleModelProvided.setName("USER");
+        roleModelProvided.setName(RoleEnum.USER);
 
         roleModelProvided = roleRepository.save(roleModelProvided);
 
@@ -50,7 +51,7 @@ public class RoleControllerTest extends GenericControllerTest {
         mockMvc.perform(url)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("USER"));
+                .andExpect(jsonPath("$.name").value(RoleEnum.USER.name()));
     }
 
     @Test
@@ -67,12 +68,12 @@ public class RoleControllerTest extends GenericControllerTest {
     @Test
     void getAllTest() throws Exception {
         final RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setName("MANAGER");
+        roleModel1Provided.setName(RoleEnum.MANAGER);
 
         roleRepository.save(roleModel1Provided);
 
         final RoleModel roleModel2Provided = new RoleModel();
-        roleModel2Provided.setName("USER");
+        roleModel2Provided.setName(RoleEnum.USER);
 
         roleRepository.save(roleModel2Provided);
 
@@ -83,7 +84,10 @@ public class RoleControllerTest extends GenericControllerTest {
         mockMvc.perform(url)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
-                .andExpect(jsonPath("$[*].name", containsInAnyOrder("USER", "MANAGER", "ADMIN")));
+                .andExpect(jsonPath("$[*].name",
+                        containsInAnyOrder(RoleEnum.USER.name(),
+                                RoleEnum.MANAGER.name(),
+                                RoleEnum.ADMIN.name())));
     }
 
     @Test
@@ -105,14 +109,14 @@ public class RoleControllerTest extends GenericControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
 
-        final RoleModel role = roleRepository.findByName("MANAGER").orElseThrow();
-        assertThat(role.getName()).isEqualTo("MANAGER");
+        final RoleModel role = roleRepository.findByName(RoleEnum.MANAGER).orElseThrow();
+        assertThat(role.getName()).isEqualTo(RoleEnum.MANAGER);
     }
 
     @Test
     void createRoleTest_RoleAlreadyExist() throws Exception {
         final RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setName("USER");
+        roleModel1Provided.setName(RoleEnum.USER);
 
         roleRepository.save(roleModel1Provided);
 
@@ -136,7 +140,7 @@ public class RoleControllerTest extends GenericControllerTest {
     @Test
     void updateRoleTest() throws Exception {
         RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setName("USER");
+        roleModel1Provided.setName(RoleEnum.USER);
 
         roleModel1Provided = roleRepository.save(roleModel1Provided);
 
@@ -158,9 +162,9 @@ public class RoleControllerTest extends GenericControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
 
-        final RoleModel role = roleRepository.findByName("MANAGER").orElseThrow();
+        final RoleModel role = roleRepository.findByName(RoleEnum.MANAGER).orElseThrow();
         assertThat(role.getId()).isNotNull();
-        assertThat(role.getName()).isEqualTo("MANAGER");
+        assertThat(role.getName()).isEqualTo(RoleEnum.MANAGER);
     }
 
     @Test
@@ -185,7 +189,7 @@ public class RoleControllerTest extends GenericControllerTest {
     @Test
     void deleteRoleTest() throws Exception {
         RoleModel roleModel1Provided = new RoleModel();
-        roleModel1Provided.setName("USER");
+        roleModel1Provided.setName(RoleEnum.USER);
 
         roleModel1Provided = roleRepository.save(roleModel1Provided);
 
@@ -197,7 +201,7 @@ public class RoleControllerTest extends GenericControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        final Optional<RoleModel> roleModelOptional = roleRepository.findByName("USER");
+        final Optional<RoleModel> roleModelOptional = roleRepository.findByName(RoleEnum.USER);
         assertThat(roleModelOptional).isEmpty();
     }
 

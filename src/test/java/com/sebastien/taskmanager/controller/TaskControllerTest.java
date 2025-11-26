@@ -19,6 +19,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.modelmapper.internal.bytebuddy.matcher.ElementMatchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,6 +37,13 @@ public class TaskControllerTest extends GenericControllerTest {
     private JwtService jwtService;
 
     private final String URL = "/api/tasks";
+
+    @Test
+    void protectedEndpointShouldReturn401WithoutToken() throws Exception {
+        mockMvc.perform(get(URL))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     void getByIdTest() throws Exception {

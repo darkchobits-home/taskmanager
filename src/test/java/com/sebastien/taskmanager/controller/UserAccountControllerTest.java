@@ -2,6 +2,7 @@ package com.sebastien.taskmanager.controller;
 
 import com.sebastien.taskmanager.dto.role.RoleDTO;
 import com.sebastien.taskmanager.dto.useraccount.UserAccountDTO;
+import com.sebastien.taskmanager.enums.RoleEnum;
 import com.sebastien.taskmanager.model.RoleModel;
 import com.sebastien.taskmanager.model.UserAccountModel;
 import com.sebastien.taskmanager.repository.RoleRepository;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +43,13 @@ public class UserAccountControllerTest extends GenericControllerTest {
     private final String URL = "/api/useraccount";
 
     @Test
+    void protectedEndpointShouldReturn401WithoutToken() throws Exception {
+        mockMvc.perform(get(URL))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void getByIdTest() throws Exception {
         UserAccountModel userAccountModelProvided = createUserAccount();
 
@@ -53,11 +62,11 @@ public class UserAccountControllerTest extends GenericControllerTest {
                 .header("Authorization", "Bearer " + token);
 
         final RoleDTO roleDTOExpected = new RoleDTO();
-        roleDTOExpected.setName("USER");
+        roleDTOExpected.setName(RoleEnum.USER);
 
         final UserAccountDTO userAccountDTOExpected = new UserAccountDTO();
         userAccountDTOExpected.setRoles(List.of(roleDTOExpected));
-        userAccountDTOExpected.setUsername("name");
+        userAccountDTOExpected.setUsername("name@email.com");
 
         mockMvc.perform(url)
                 .andExpect(status().isOk())
@@ -80,7 +89,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
     @Test
     void getAllTest() throws Exception {
         final RoleModel roleModelProvided = new RoleModel();
-        roleModelProvided.setName("USER");
+        roleModelProvided.setName(RoleEnum.USER);
         roleRepository.save(roleModelProvided);
 
         final UserAccountModel userAccountModel1Provided = createUserAccount();
@@ -88,7 +97,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
         userAccountRepository.save(userAccountModel1Provided);
 
         final UserAccountModel userAccountModel2Provided = createUserAccount();
-        userAccountModel2Provided.setUsername("name2");
+        userAccountModel2Provided.setUsername("name2@email.com");
         userAccountModel2Provided.setRoles(new HashSet<>(List.of(roleModelProvided)));
 
         userAccountRepository.save(userAccountModel2Provided);
@@ -101,14 +110,14 @@ public class UserAccountControllerTest extends GenericControllerTest {
         mockMvc.perform(url)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
-                .andExpect(jsonPath("$[*].username", containsInAnyOrder("name", "name2", "test@example.com")));
+                .andExpect(jsonPath("$[*].username", containsInAnyOrder("name@email.com", "name2@email.com", "test@example.com")));
     }
 
     @Test
     void createUserAccountTest() throws Exception {
         final String userAccountJson = """
                 {
-                    "username": "name1",
+                    "username": "name1@email.com",
                     "password": "pass",
                     "roles" : [
                         {
@@ -130,9 +139,9 @@ public class UserAccountControllerTest extends GenericControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
 
-        final UserAccountModel userAccountModel = userAccountRepository.findByUsername("name1").orElseThrow();
+        final UserAccountModel userAccountModel = userAccountRepository.findByUsername("name1@email.com").orElseThrow();
 
-        assertThat(userAccountModel.getUsername()).isEqualTo("name1");
+        assertThat(userAccountModel.getUsername()).isEqualTo("name1@email.com");
         assertThat(userAccountModel.getPassword()).isNotEqualTo("pass");
         assertThat(userAccountModel.getRoles()).hasSize(1);
     }
@@ -140,7 +149,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
     @Test
     void createUserAccountTest_UserAccountUsernameAlreadyExist() throws Exception {
         RoleModel roleModelProvided = new RoleModel();
-        roleModelProvided.setName("USER");
+        roleModelProvided.setName(RoleEnum.USER);
         roleModelProvided = roleRepository.save(roleModelProvided);
 
         final UserAccountModel userAccountModelProvided = createUserAccount();
@@ -163,8 +172,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
         final String userAccountJsonFormatted = String.format(userAccountJson,
                 userAccountModelProvided.getUsername(),
                 userAccountModelProvided.getPassword(),
-                userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getId).orElse(null),
-                userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getName).orElse(""));
+                userAccountModelProvided.getRoles().stream().findFirst().map(RoleModel::getName).orElse(RoleEnum.ADMIN));
 
         final String token = generateToken();
 
@@ -181,7 +189,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
     @Test
     void updateUserAccountTest() throws Exception {
         RoleModel roleModelProvided = new RoleModel();
-        roleModelProvided.setName("USER");
+        roleModelProvided.setName(RoleEnum.USER);
         roleModelProvided = roleRepository.save(roleModelProvided);
 
         UserAccountModel userAccountModelProvided = createUserAccount();
@@ -192,7 +200,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
         final String userAccountJson = """
                 {
                     "id": %d,
-                    "username": "NewName",
+                    "username": "NewName@email.com",
                     "password": "NewPass",
                     "roles" : [
                         {
@@ -218,8 +226,8 @@ public class UserAccountControllerTest extends GenericControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNumber());
 
-        final UserAccountModel userAccountModel = userAccountRepository.findByUsername("NewName").orElseThrow();
-        assertThat(userAccountModel.getUsername()).isEqualTo("NewName");
+        final UserAccountModel userAccountModel = userAccountRepository.findByUsername("NewName@email.com").orElseThrow();
+        assertThat(userAccountModel.getUsername()).isEqualTo("NewName@email.com");
         assertThat(userAccountModel.getPassword()).isNotEqualTo("NewPass");
     }
 
@@ -228,7 +236,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
         final String userAccountJson = """
                 {
                     "id": 1,
-                    "username": "NewName",
+                    "username": "NewName@email.com",
                     "password": "NewPass",
                     "roles" : [
                         {
@@ -285,7 +293,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
     private UserAccountModel createUserAccount() {
         final UserAccountModel userAccountModel = new UserAccountModel();
         userAccountModel.setPassword(passwordEncoder.encode("pass"));
-        userAccountModel.setUsername("name");
+        userAccountModel.setUsername("name@email.com");
 
         return userAccountModel;
     }

@@ -1,5 +1,6 @@
 package com.sebastien.taskmanager.model;
 
+import com.sebastien.taskmanager.enums.RoleEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,9 @@ public class RoleModel implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true)
-    private String name;
+    @Column(unique = true, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum name;
+
+    private String description;
 }

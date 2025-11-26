@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -45,6 +46,7 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @PostMapping
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Long> createRole(@RequestBody RoleCreationDTO roleCreationDTO) {
         final Role role = roleDtoToEntityConverter.convertCreationDtoToEntity(roleCreationDTO);
         final Optional<Long> userAccountId = roleService.createRole(role);
@@ -58,6 +60,7 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @GetMapping
+    @Secured("ROLE_ADMIN")
     public Set<RoleDTO> getAll() {
         final Set<Role> allRoles = roleService.getAll();
 
@@ -72,6 +75,7 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @GetMapping("/{id}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<RoleDTO> getById(@PathVariable @NotNull Long id) {
         Optional<Role> roleOptional = roleService.getById(id);
 
@@ -85,6 +89,7 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @PutMapping("/update")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Long> updateRole(@RequestBody RoleUpdateDTO roleUpdateDTO) {
         final Role role = roleDtoToEntityConverter.convertUpdateDtoToEntity(roleUpdateDTO);
         final Optional<Long> roleIdOptional = roleService.updateRole(role);
@@ -100,6 +105,7 @@ public class RoleController {
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
     @DeleteMapping("/delete/{roleId}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Long> deleteRole(@PathVariable @NotNull Long roleId) {
         roleService.deleteRole(roleId);
 
