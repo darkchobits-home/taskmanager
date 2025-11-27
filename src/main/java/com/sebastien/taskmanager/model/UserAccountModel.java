@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,4 +32,10 @@ public class UserAccountModel implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<RoleModel> roles = new HashSet<>();
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "refresh_token_expiration")
+    private LocalDateTime refreshTokenExpiration;
 }

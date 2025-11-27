@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface UserAccountRepository extends JpaRepository<UserAccountModel, Long> {
 
     Optional<UserAccountModel> findByUsername(String username);
+
+    Optional<UserAccountModel> findByRefreshToken(String refreshToken);
 }

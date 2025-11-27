@@ -118,7 +118,7 @@ public class UserAccountControllerTest extends GenericControllerTest {
         final String userAccountJson = """
                 {
                     "username": "name1@email.com",
-                    "password": "pass",
+                    "password": "pass23",
                     "roles" : [
                         {
                             "name": "ADMIN"
@@ -142,8 +142,34 @@ public class UserAccountControllerTest extends GenericControllerTest {
         final UserAccountModel userAccountModel = userAccountRepository.findByUsername("name1@email.com").orElseThrow();
 
         assertThat(userAccountModel.getUsername()).isEqualTo("name1@email.com");
-        assertThat(userAccountModel.getPassword()).isNotEqualTo("pass");
+        assertThat(userAccountModel.getPassword()).isNotEqualTo("pass23");
         assertThat(userAccountModel.getRoles()).hasSize(1);
+    }
+
+    @Test
+    void createUserAccountTest_passwordLessThan6Caracter() throws Exception {
+        final String userAccountJson = """
+                {
+                    "username": "name1@email.com",
+                    "password": "pass",
+                    "roles" : [
+                        {
+                            "name": "ADMIN"
+                        }
+                    ]
+                }
+                """;
+
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.post(URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userAccountJson)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test

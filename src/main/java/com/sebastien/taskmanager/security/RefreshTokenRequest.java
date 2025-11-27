@@ -3,12 +3,9 @@ package com.sebastien.taskmanager.security;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data
 @AllArgsConstructor
-public class AuthResponse {
-
-    private String accessToken;
+@Data
+public class RefreshTokenRequest {
 
     private String refreshToken;
-
 }

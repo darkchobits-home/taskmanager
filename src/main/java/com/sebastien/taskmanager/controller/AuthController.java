@@ -1,7 +1,9 @@
 package com.sebastien.taskmanager.controller;
 
+import com.sebastien.taskmanager.dto.TokenResponseDto;
 import com.sebastien.taskmanager.security.AuthRequest;
 import com.sebastien.taskmanager.security.AuthResponse;
+import com.sebastien.taskmanager.security.RefreshTokenRequest;
 import com.sebastien.taskmanager.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,13 @@ public class AuthController {
         final AuthResponse authResponse = authService.login(authRequest);
 
         return ResponseEntity.ok(authResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponseDto> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        final TokenResponseDto tokenResponseDto = authService.refresh(refreshTokenRequest);
+
+        return ResponseEntity.ok(tokenResponseDto);
     }
     
 }

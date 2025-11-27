@@ -65,9 +65,26 @@ public class GenericControllerTest {
         userAccountModel.setRoles(new HashSet<>(List.of(roleModel)));
 
         userAccountRepository.save(userAccountModel);
+
+        final String token = generateRefreshToken();
+        userAccountModel.setRefreshToken(token);
+
+        userAccountRepository.save(userAccountModel);
     }
 
     protected String generateToken() {
+        final UserDetails userDetails = getUserDetails();
+
+        return jwtService.generateAccessToken(userDetails);
+    }
+
+    private String generateRefreshToken() {
+        final UserDetails userDetails = getUserDetails();
+
+        return jwtService.generateRefreshToken(userDetails);
+    }
+
+    private UserDetails getUserDetails() {
         final UserAccountModel userAccountModel = userAccountRepository.findByUsername(USERNAME).orElseThrow();
         final UserDetails userDetails = new User(userAccountModel.getUsername(),
                 userAccountModel.getPassword(),
@@ -75,7 +92,7 @@ public class GenericControllerTest {
                         .map(roleModel -> new SimpleGrantedAuthority("ROLE_" + roleModel.getName()))
                         .collect(Collectors.toList()));
 
-        return jwtService.generateToken(userDetails);
+        return userDetails;
     }
 }
 

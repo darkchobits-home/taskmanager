@@ -10,6 +10,7 @@ import com.sebastien.taskmanager.service.UserAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class UserAccountController {
     })
     @PostMapping
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<Long> createUser(@RequestBody UserAccountCreationDTO userAccountCreationDTO) {
+    public ResponseEntity<Long> createUser(@Valid @RequestBody UserAccountCreationDTO userAccountCreationDTO) {
 
         final UserAccount userAccount = userAccountDtoToEntityConverter.convertCreationDtoToEntity(userAccountCreationDTO);
         final String passwordEncoded = passwordEncoder.encode(userAccount.getPassword());
@@ -94,7 +95,7 @@ public class UserAccountController {
     })
     @PutMapping("/update")
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<Long> updateUser(@RequestBody UserAccountUpdateDTO userAccountUpdateDTO) {
+    public ResponseEntity<Long> updateUser(@Valid @RequestBody UserAccountUpdateDTO userAccountUpdateDTO) {
 
         final UserAccount userAccount = userAccountDtoToEntityConverter.convertUpdateDtoToEntity(userAccountUpdateDTO);
         final String passwordEncoded = passwordEncoder.encode(userAccount.getPassword());
