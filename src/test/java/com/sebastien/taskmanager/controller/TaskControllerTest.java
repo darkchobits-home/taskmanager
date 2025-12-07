@@ -83,7 +83,7 @@ public class TaskControllerTest extends GenericControllerTest {
     }
 
     @Test
-    void getAllTest() throws Exception {
+    void getAllPageableTest() throws Exception {
         final TaskModel taskModel1Provided = createTaskModel();
 
         taskRepository.save(taskModel1Provided);
@@ -95,10 +95,11 @@ public class TaskControllerTest extends GenericControllerTest {
 
         final String token = generateToken();
 
-        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL)
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/list?page=0&size=2")
                 .header("Authorization", "Bearer " + token);
 
         mockMvc.perform(url)
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[*].title", containsInAnyOrder("Title", "title 2")));
@@ -130,6 +131,29 @@ public class TaskControllerTest extends GenericControllerTest {
         List<TaskModel> taskModelList = taskRepository.findAll();
         assertThat(taskModelList).hasSize(1);
         assertThat(taskModelList.get(0).getTitle()).isEqualTo("Task 1");
+    }
+
+    @Test
+    void searchTest() throws Exception {
+        final TaskModel taskModel1Provided = createTaskModel();
+
+        taskRepository.save(taskModel1Provided);
+
+        final TaskModel taskModel2Provided = createTaskModel();
+        taskModel2Provided.setTitle("Divers");
+
+        taskRepository.save(taskModel2Provided);
+
+        final String token = generateToken();
+
+        final MockHttpServletRequestBuilder url = MockMvcRequestBuilders.get(URL + "/search?title=div&page=0&size=2")
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(url)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Divers"));
     }
 
     @Test

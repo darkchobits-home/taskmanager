@@ -12,6 +12,9 @@ import com.sebastien.taskmanager.model.UserAccountModel;
 import com.sebastien.taskmanager.repository.TaskRepository;
 import com.sebastien.taskmanager.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,6 +64,21 @@ public class TaskService {
         }
 
         return save(taskModel);
+    }
+
+    /**
+     * Get all task with a pageable system.
+     *
+     * @param pageable
+     * @return
+     */
+    public Page<Task> getAll(Pageable pageable) {
+        Page<TaskModel> taskModelPage = taskRepository.findAll(pageable);
+
+        List<Task> taskList = taskModelPage.stream().map(taskModel -> this.taskModelToEntityConverter.convertModelToEntity(taskModel))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(taskList);
     }
 
     /**
@@ -148,4 +166,18 @@ public class TaskService {
         return Optional.of(taskModelSaved.getId());
     }
 
+    /**
+     * Search tasks by title.
+     *
+     * @param title The title.
+     * @param pageable The page detail.
+     * @return A Page of Task containing the title.
+     */
+    public Page<Task> searchByTitle(String title, Pageable pageable) {
+        Page<TaskModel> taskModelPage = taskRepository.findByTitleContainingIgnoreCase(title, pageable);
+        List<Task> taskList = taskModelPage.stream().map(taskModel -> this.taskModelToEntityConverter.convertModelToEntity(taskModel)).toList();
+
+        return new PageImpl<>(taskList);
+
+    }
 }

@@ -13,10 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,10 +65,14 @@ public class TaskController {
             @ApiResponse(responseCode = "200", description = "Successfully created."),
             @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
     })
-    @GetMapping
+    @GetMapping("/list")
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    public Set<TaskDTO> getAll() {
-        final Set<Task> allTasks = taskService.getAll();
+    public Set<TaskDTO> getAll(@RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "10") int size,
+                               @RequestParam(defaultValue = "id,asc") String [] sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(parseSort(sort)));
+
+        Page<Task> allTasks = taskService.getAll(pageable);
 
         return allTasks.stream().map(task -> taskEntityToDtoConverter.convertEntityToDto(task)).collect(Collectors.toSet());
     }
@@ -109,5 +115,33 @@ public class TaskController {
         taskService.deleteTask(taskId);
 
         return ResponseEntity.ok(taskId);
+    }
+
+    @Operation(summary = "Search task containing a title", description = "Return a list of Task containing a title.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully searched."),
+            @ApiResponse(responseCode = "500", description = "Unknown error, see details in logs.")
+    })
+    @GetMapping("/search")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    public ResponseEntity<Page<TaskDTO>> searchTasks(@RequestParam String title,
+                                                     @RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Task> tasksFoundPage = taskService.searchByTitle(title, pageable);
+        List<TaskDTO> taskDTOList = tasksFoundPage.stream().map(task -> this.taskEntityToDtoConverter.convertEntityToDto(task)).collect(Collectors.toList());
+
+        return ResponseEntity.ok(new PageImpl<>(taskDTOList));
+    }
+
+    private Sort.Order parseSort(String[] sort) {
+        if (sort.length == 2) {
+            return new Sort.Order(
+                    sort[1].equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC,
+                    sort[0]
+            );
+        }
+        return new Sort.Order(Sort.Direction.ASC, "id");
     }
 }
